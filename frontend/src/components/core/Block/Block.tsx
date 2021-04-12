@@ -17,7 +17,6 @@
 
 import {
   Alert as AlertProto,
-  Arrow as ArrowProto,
   Audio as AudioProto,
   BokehChart as BokehChartProto,
   Button as ButtonProto,
@@ -58,6 +57,7 @@ import { WidgetStateManager } from "lib/WidgetStateManager"
 import { getElementWidgetID } from "lib/utils"
 import { FileUploadClient } from "lib/FileUploadClient"
 import { BlockNode, ReportNode, ElementNode } from "lib/ReportNode"
+import { Quiver } from "lib/Quiver"
 
 // Load (non-lazy) elements.
 import Alert from "components/elements/Alert/"
@@ -333,8 +333,7 @@ class Block extends PureComponent<Props> {
         return <Balloons reportId={this.props.reportId} />
 
       case "betaTable":
-        return <BetaTable element={node.immutableElement.get("betaTable")} />
-      // return <BetaTable element={node.element.betaTable as ArrowProto} />
+        return <BetaTable element={node.quiverElement as Quiver} />
 
       case "bokehChart":
         return (
