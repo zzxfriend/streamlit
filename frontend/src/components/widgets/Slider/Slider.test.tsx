@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ import React from "react"
 import { Slider as UISlider } from "baseui/slider"
 import TimezoneMock from "timezone-mock"
 
-import { Slider as SliderProto } from "autogen/proto"
-import { mount } from "lib/test_util"
-import { WidgetStateManager } from "lib/WidgetStateManager"
-import { mainTheme } from "theme"
+import { Slider as SliderProto } from "src/autogen/proto"
+import { mount } from "src/lib/test_util"
+import { WidgetStateManager } from "src/lib/WidgetStateManager"
+import { lightTheme } from "src/theme"
 import Slider, { Props } from "./Slider"
 
-jest.mock("lib/WidgetStateManager")
+jest.mock("src/lib/WidgetStateManager")
 
 const sendBackMsg = jest.fn()
 const getProps = (elementProps: Partial<SliderProto> = {}): Props => ({
@@ -43,7 +43,7 @@ const getProps = (elementProps: Partial<SliderProto> = {}): Props => ({
   width: 0,
   disabled: false,
   widgetMgr: new WidgetStateManager(sendBackMsg),
-  theme: mainTheme,
+  theme: lightTheme.emotion,
 })
 
 describe("Slider widget", () => {
@@ -101,6 +101,13 @@ describe("Slider widget", () => {
       expect(wrapper).toBeDefined()
     })
 
+    it("displays a thumb value", () => {
+      const props = getProps()
+      const wrapper = mount(<Slider {...props} />)
+
+      expect(wrapper.find("StyledThumbValue")).toHaveLength(1)
+    })
+
     it("should have a correct value", () => {
       const props = getProps()
       const wrapper = mount(<Slider {...props} />)
@@ -142,6 +149,15 @@ describe("Slider widget", () => {
       const wrapper = mount(<Slider {...props} />)
 
       expect(wrapper).toBeDefined()
+    })
+
+    it("displays 2 thumb values", () => {
+      const props = getProps({
+        default: [1, 9],
+      })
+      const wrapper = mount(<Slider {...props} />)
+
+      expect(wrapper.find("StyledThumbValue")).toHaveLength(2)
     })
 
     it("should have a correct value", () => {
@@ -342,10 +358,13 @@ describe("Slider widget", () => {
       }
       const props = getProps(originalProps)
       const wrapper = mount(<Slider {...props} />)
+
       // @ts-ignore
       wrapper.find(UISlider).prop("onChange")({
         value: [4],
       })
+      wrapper.update()
+
       const sliderDOMNodes = wrapper.find("div[role='slider']")
       sliderDOMNodes.forEach(node => {
         expect(node.getDOMNode().getAttribute("aria-valuetext")).toEqual(

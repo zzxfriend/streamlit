@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ class BokehMixin:
         ...     x_axis_label='x',
         ...     y_axis_label='y')
         ...
-        >>> p.line(x, y, legend='Trend', line_width=2)
+        >>> p.line(x, y, legend_label='Trend', line_width=2)
         >>>
         >>> st.bokeh_chart(p, use_container_width=True)
 

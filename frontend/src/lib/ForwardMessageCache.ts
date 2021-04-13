@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { ForwardMsg, ForwardMsgMetadata } from "autogen/proto"
-import { logMessage } from "lib/log"
-import { BaseUriParts, buildHttpUri } from "lib/UriUtil"
+import { ForwardMsg, ForwardMsgMetadata } from "src/autogen/proto"
+import { logMessage } from "src/lib/log"
+import { BaseUriParts, buildHttpUri } from "src/lib/UriUtil"
 
 class CacheEntry {
   public readonly msg: ForwardMsg

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
  */
 
 import React from "react"
-import { mount } from "lib/test_util"
-import { WidgetStateManager } from "lib/WidgetStateManager"
+import { mount } from "src/lib/test_util"
+import { WidgetStateManager } from "src/lib/WidgetStateManager"
 
 import { Radio as UIRadio, RadioGroup } from "baseui/radio"
-import { Radio as RadioProto } from "autogen/proto"
+import { Radio as RadioProto } from "src/autogen/proto"
 import Radio, { Props } from "./Radio"
 
-jest.mock("lib/WidgetStateManager")
+jest.mock("src/lib/WidgetStateManager")
 
 const sendBackMsg = jest.fn()
 

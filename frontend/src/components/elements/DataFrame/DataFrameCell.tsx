@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 import React, { ComponentType, ReactElement } from "react"
 import { ChevronTop, ChevronBottom } from "@emotion-icons/open-iconic"
-import Icon from "components/shared/Icon"
+import Icon from "src/components/shared/Icon"
 import { SortDirection } from "./SortDirection"
 import { StyledSortIcon } from "./styled-components"
 

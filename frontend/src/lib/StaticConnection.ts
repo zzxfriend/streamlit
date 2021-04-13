@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import { ForwardMsg, StaticManifest } from "autogen/proto"
-import { ConnectionState } from "lib/ConnectionState"
-import { logError } from "lib/log"
-import { getReportObject } from "lib/s3helper"
+import { ForwardMsg, StaticManifest } from "src/autogen/proto"
+import { ConnectionState } from "src/lib/ConnectionState"
+import { logError } from "src/lib/log"
+import { getReportObject } from "src/lib/s3helper"
 
 interface Props {
   reportId: string

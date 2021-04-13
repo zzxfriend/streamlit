@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 import React from "react"
 import { BaseProvider, LightTheme } from "baseui"
 
-import { ModalHeader, ModalBody } from "components/shared/Modal"
-import { mount } from "lib/test_util"
+import { ModalHeader, ModalBody } from "src/components/shared/Modal"
+import { mount } from "src/lib/test_util"
 import UnsupportedBrowserDialog from "./UnsupportedBrowserDialog"
 
 describe("UnsupportedBrowserDialog", () => {

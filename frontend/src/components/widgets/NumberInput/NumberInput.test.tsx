@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-import { NumberInput as NumberInputProto } from "autogen/proto"
+import { NumberInput as NumberInputProto } from "src/autogen/proto"
 import React from "react"
-import { shallow } from "lib/test_util"
+import { shallow } from "src/lib/test_util"
 import { Input as UIInput } from "baseui/input"
-import { WidgetStateManager } from "lib/WidgetStateManager"
+import { WidgetStateManager } from "src/lib/WidgetStateManager"
 
 import NumberInput, { Props } from "./NumberInput"
 
-jest.mock("lib/WidgetStateManager")
+jest.mock("src/lib/WidgetStateManager")
 
 const sendBackMsg = jest.fn()
 const preventDefault = jest.fn()

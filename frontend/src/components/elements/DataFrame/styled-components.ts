@@ -1,6 +1,23 @@
+/**
+ * @license
+ * Copyright 2018-2021 Streamlit Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import styled, { CSSObject } from "@emotion/styled"
 import { transparentize } from "color2k"
-import { Theme } from "theme"
+import { Theme } from "src/theme"
 
 export interface StyledDataFrameContainerProps {
   width: number
@@ -10,30 +27,30 @@ export const StyledDataFrameContainer = styled.div<
   StyledDataFrameContainerProps
 >(({ width, theme }) => ({
   width,
-  border: `1px solid ${theme.colors.lightestGray}`,
+  border: `1px solid ${theme.colors.secondaryBg}`,
   boxSizing: "content-box",
 
   "& .table-top-right": {
     overflowX: "hidden",
-    backgroundColor: theme.colors.lightestGray,
+    backgroundColor: theme.colors.secondaryBg,
   },
   "& .table-bottom-left": {
     overflowY: "hidden",
-    backgroundColor: theme.colors.lightestGray,
+    backgroundColor: theme.colors.secondaryBg,
   },
 }))
 
 const StyledDataFrameCell = styled.div(({ theme }) => ({
   padding: theme.spacing.sm,
   fontSize: theme.fontSizes.smDefault,
-  fontFamily: theme.fonts.mono,
+  fontFamily: theme.fonts.monospace,
   textAlign: "right",
   lineHeight: theme.lineHeights.none,
 }))
 
 const headerCellFormatter = (theme: Theme): CSSObject => ({
-  backgroundColor: theme.colors.lightestGray,
-  color: theme.colors.darkGray,
+  backgroundColor: theme.colors.secondaryBg,
+  color: theme.colors.fadedText60,
   zIndex: 1,
 })
 
@@ -92,7 +109,7 @@ export const StyledFixup = styled.div<StyledFixupProps>(
 )
 
 export const StyledEmptyDataframe = styled.div(({ theme }) => ({
-  fontFamily: theme.fonts.mono,
+  fontFamily: theme.fonts.monospace,
   color: theme.colors.darkGray,
   fontStyle: "italic",
   fontSize: theme.fontSizes.smDefault,

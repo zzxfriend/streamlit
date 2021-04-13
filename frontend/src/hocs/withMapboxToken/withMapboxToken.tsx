@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import Alert from "components/elements/Alert"
-import { Kind } from "components/shared/AlertContainer"
-import { MapboxToken } from "hocs/withMapboxToken/MapboxToken"
+import Alert from "src/components/elements/Alert"
+import { Kind } from "src/components/shared/AlertContainer"
+import { MapboxToken } from "src/hocs/withMapboxToken/MapboxToken"
 import hoistNonReactStatics from "hoist-non-react-statics"
 import React, { ComponentType, PureComponent } from "react"
 import MapboxTokenError from "./MapboxTokenError"

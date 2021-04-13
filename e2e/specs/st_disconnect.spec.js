@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ describe("kill server", () => {
 
       // Snapshot `stToolbar` instead of `ConnectionStatus` so we have a larger
       // bounding box and a lower percentage difference on the snapshot diff
-      cy.get("[data-testid='stToolbar']").matchImageSnapshot("disconnected");
+      cy.get("[data-testid='stToolbar']").matchThemedSnapshots("disconnected");
     });
   });
 });

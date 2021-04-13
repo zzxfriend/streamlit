@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
  */
 
 import React from "react"
-import { mount, shallow } from "lib/test_util"
+import { mount, shallow } from "src/lib/test_util"
 
-import { Small } from "components/shared/TextElements"
+import { Small } from "src/components/shared/TextElements"
 import FileDropzoneInstructions, { Props } from "./FileDropzoneInstructions"
 
 const getProps = (props: Partial<Props> = {}): Props => ({

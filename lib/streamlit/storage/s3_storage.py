@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import os
 from tornado import gen
 from tornado.concurrent import run_on_executor, futures
 
+from streamlit import util
 from streamlit import errors
 from streamlit import config
 from streamlit.storage.abstract_storage import AbstractStorage

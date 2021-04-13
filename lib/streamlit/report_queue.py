@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import threading
 from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
 
 from streamlit.logger import get_logger
+from streamlit import util
 
 LOGGER = get_logger(__name__)
 
@@ -40,6 +41,9 @@ class ReportQueue(object):
             # Map: (delta_path, msg.metadata.delta_id) -> _queue.indexof(msg),
             # where delta_path = (container, parent block path as a string)
             self._delta_index_map = dict()
+
+    def __repr__(self) -> str:
+        return util.repr_(self)
 
     def get_debug(self):
         from google.protobuf.json_format import MessageToDict
@@ -132,15 +136,13 @@ def compose_deltas(old_delta, new_delta):
         return new_delta
 
     elif new_delta_type == "add_rows":
-        import streamlit.elements.data_frame_proto as data_frame_proto
+        import streamlit.elements.data_frame as data_frame
 
-        # We should make data_frame_proto.add_rows *not* mutate any of the
+        # We should make data_frame.add_rows *not* mutate any of the
         # inputs. In the meantime, we have to deepcopy the input that will be
         # mutated.
         composed_delta = copy.deepcopy(old_delta)
-        data_frame_proto.add_rows(
-            composed_delta, new_delta, name=new_delta.add_rows.name
-        )
+        data_frame.add_rows(composed_delta, new_delta, name=new_delta.add_rows.name)
         return composed_delta
 
     # (HK) TODO: Implement composition of 2 deltas for beta_add_rows.

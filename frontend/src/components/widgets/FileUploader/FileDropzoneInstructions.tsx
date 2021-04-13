@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 
 import React from "react"
 import { CloudUpload } from "@emotion-icons/material-outlined"
-import Icon from "components/shared/Icon"
-import { FileSize, getSizeDisplay } from "lib/FileHelper"
-import { Small } from "components/shared/TextElements"
+import Icon from "src/components/shared/Icon"
+import { FileSize, getSizeDisplay } from "src/lib/FileHelper"
+import { Small } from "src/components/shared/TextElements"
 
 import {
   StyledFileDropzoneInstructions,

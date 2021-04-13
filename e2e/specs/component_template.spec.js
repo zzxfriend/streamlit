@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,11 @@ describe("Component template", () => {
       .should("have.text", "Click Me!");
 
     cy.get(".element-container > iframe").each((el, idx) => {
-      return cy.wrap(el).matchImageSnapshot("iframe" + idx);
+      return cy
+        .wrap(el)
+        .matchImageSnapshot(
+          "iframe-" + Cypress.env("COMPONENT_TEMPLATE_TYPE") + idx
+        );
     });
 
     cy.get(".element-container > .stMarkdown p").each(el => {

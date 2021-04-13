@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@
 import React, { ReactElement, useEffect, useState } from "react"
 import { Map as ImmutableMap } from "immutable"
 import { MultiGrid } from "react-virtualized"
-import withFullScreenWrapper from "hocs/withFullScreenWrapper"
+import withFullScreenWrapper from "src/hocs/withFullScreenWrapper"
 import {
   dataFrameGetDimensions,
   getSortedDataRowIndices,
   tableGetRowsAndCols,
-} from "lib/dataFrameProto"
+} from "src/lib/dataFrameProto"
 import { SortDirection } from "./SortDirection"
 import {
   StyledDataFrameContainer,

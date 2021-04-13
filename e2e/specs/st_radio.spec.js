@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ describe("st.radio", () => {
     cy.get(".stRadio").should("have.length", 3);
 
     cy.get(".stRadio").each((el, idx) => {
-      return cy.wrap(el).matchImageSnapshot("radio" + idx);
+      return cy.wrap(el).matchThemedSnapshots("radio" + idx);
     });
   });
 

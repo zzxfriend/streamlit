@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import React from "react"
 import { ThemeProvider as BaseUIThemeProvider } from "baseui"
 import { ThemeProvider as EmotionThemeProvider } from "emotion-theming"
-import { shallow } from "lib/test_util"
+import { shallow } from "src/lib/test_util"
 import {
-  mainTheme,
-  sidebarTheme,
-  mainBaseUITheme,
-  sidebarBaseUITheme,
-} from "theme"
+  darkTheme,
+  darkBaseUITheme,
+  lightTheme,
+  lightBaseUITheme,
+} from "src/theme"
 import ThemeProvider from "./ThemeProvider"
 
 describe("ThemeProvider component", () => {
   it("renders both theme providers without an error", () => {
     const wrapper = shallow(
-      <ThemeProvider theme={mainTheme} baseuiTheme={mainBaseUITheme}>
+      <ThemeProvider theme={lightTheme.emotion} baseuiTheme={lightBaseUITheme}>
         null
       </ThemeProvider>
     )
@@ -39,35 +40,39 @@ describe("ThemeProvider component", () => {
 
   it("sets the correct themes", () => {
     let wrapper = shallow(
-      <ThemeProvider theme={mainTheme} baseuiTheme={mainBaseUITheme}>
+      <ThemeProvider theme={lightTheme.emotion} baseuiTheme={lightBaseUITheme}>
         null
       </ThemeProvider>
     )
     expect(wrapper.find(BaseUIThemeProvider).prop("theme")).toEqual(
-      mainBaseUITheme
-    )
-    expect(wrapper.find(EmotionThemeProvider).prop("theme")).toEqual(mainTheme)
-
-    wrapper = shallow(
-      <ThemeProvider theme={sidebarTheme} baseuiTheme={sidebarBaseUITheme}>
-        null
-      </ThemeProvider>
-    )
-    expect(wrapper.find(BaseUIThemeProvider).prop("theme")).toEqual(
-      sidebarBaseUITheme
+      lightBaseUITheme
     )
     expect(wrapper.find(EmotionThemeProvider).prop("theme")).toEqual(
-      sidebarTheme
+      lightTheme.emotion
+    )
+
+    wrapper = shallow(
+      <ThemeProvider theme={darkTheme.emotion} baseuiTheme={darkBaseUITheme}>
+        null
+      </ThemeProvider>
+    )
+    expect(wrapper.find(BaseUIThemeProvider).prop("theme")).toEqual(
+      darkBaseUITheme
+    )
+    expect(wrapper.find(EmotionThemeProvider).prop("theme")).toEqual(
+      darkTheme.emotion
     )
   })
 
   it("sets the correct default baseui themes", () => {
     const wrapper = shallow(
-      <ThemeProvider theme={mainTheme}>null</ThemeProvider>
+      <ThemeProvider theme={lightTheme.emotion}>null</ThemeProvider>
     )
     expect(wrapper.find(BaseUIThemeProvider).prop("theme")).toEqual(
-      mainBaseUITheme
+      lightBaseUITheme
     )
-    expect(wrapper.find(EmotionThemeProvider).prop("theme")).toEqual(mainTheme)
+    expect(wrapper.find(EmotionThemeProvider).prop("theme")).toEqual(
+      lightTheme.emotion
+    )
   })
 })

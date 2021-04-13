@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 import styled from "@emotion/styled"
 
 export enum Kind {
-  SECONDARY = "secondary",
   DANGER = "danger",
 }
 
@@ -27,15 +26,11 @@ interface TextProps {
 }
 
 export const Small = styled.small<TextProps>(({ kind, theme }) => {
-  const secondaryColor = kind === Kind.SECONDARY && theme.colors.secondary
-  const dangerColor = kind === Kind.DANGER && theme.colors.danger
+  const { danger, fadedText60 } = theme.colors
 
   return {
-    color: dangerColor || secondaryColor || theme.colors.darkGray,
+    color: kind === Kind.DANGER ? danger : fadedText60,
     fontSize: theme.fontSizes.smDefault,
-    height: theme.fontSizes.smDefault,
-    lineHeight: theme.fontSizes.smDefault,
-    display: "flex",
-    alignItems: "center",
+    lineHeight: "1.25",
   }
 })

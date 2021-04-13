@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
  */
 
 import nodeEmoji from "node-emoji"
-import { buildMediaUri } from "lib/UriUtil"
-import { grabTheRightIcon } from "vendor/twemoji"
-import { sendS4AMessage } from "hocs/withS4ACommunication/withS4ACommunication"
+import { buildMediaUri } from "src/lib/UriUtil"
+import { grabTheRightIcon } from "src/vendor/twemoji"
+import { sendS4AMessage } from "src/hocs/withS4ACommunication/withS4ACommunication"
 
 /**
  * Set the provided url/emoji as the page favicon.

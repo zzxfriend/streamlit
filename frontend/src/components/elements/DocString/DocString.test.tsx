@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 import React from "react"
 import { shallow } from "enzyme"
 
-import { DocString as DocStringProto } from "autogen/proto"
+import { DocString as DocStringProto } from "src/autogen/proto"
 import DocString, { DocStringProps } from "./DocString"
 
 const getProps = (

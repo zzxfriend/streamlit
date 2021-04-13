@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 import React, { ReactElement } from "react"
 import { EmotionIcon } from "@emotion-icons/emotion-icon"
-import { IconSize, ThemeColor } from "theme"
+import { IconSize, ThemeColor } from "src/theme"
 import { StyledIcon } from "./styled-components"
 
 interface IconProps {

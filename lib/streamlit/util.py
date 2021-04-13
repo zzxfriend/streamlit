@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,6 +99,12 @@ def _maybe_tuple_to_list(item):
     if isinstance(item, tuple):
         return list(item)
     return item
+
+
+def repr_(cls) -> str:
+    classname = cls.__class__.__name__
+    args = ", ".join([f"{k}={repr(v)}" for (k, v) in cls.__dict__.items()])
+    return f"{classname}({args})"
 
 
 # TODO: Move this into errors.py? Replace with StreamlitAPIException?

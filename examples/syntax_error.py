@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import streamlit as st
-import sys
 
 # # Uncomment this as a block.
 # # This tests that errors before the first st call get caught.
 # def foo():
 # EXPECTED: inline exception
-# a = not_a_real_variable  # noqa: F821 pylint:disable=undefined-variable,unused-variable
+# a = not_a_real_variable
 
 # foo()
 

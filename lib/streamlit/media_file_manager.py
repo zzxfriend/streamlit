@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import hashlib
 
 from streamlit.report_thread import get_report_ctx
 from streamlit.logger import get_logger
+from streamlit import util
 
 LOGGER = get_logger(__name__)
 
@@ -64,6 +65,9 @@ class MediaFile(object):
         self._file_id = file_id
         self._content = content
         self._mimetype = mimetype
+
+    def __repr__(self) -> str:
+        return util.repr_(self)
 
     @property
     def url(self):
@@ -115,6 +119,9 @@ class MediaFileManager(object):
         self._files_by_session_and_coord = collections.defaultdict(
             dict
         )  # type: DefaultDict[str, Dict[str, MediaFile]]
+
+    def __repr__(self) -> str:
+        return util.repr_(self)
 
     def del_expired_files(self):
         LOGGER.debug("Deleting expired files...")

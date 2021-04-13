@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from streamlit import util
 from streamlit import file_util
 from streamlit import config
 
@@ -62,6 +63,9 @@ class FolderBlackList(object):
         """
         self._folder_blacklist = list(folder_blacklist)
         self._folder_blacklist.extend(DEFAULT_FOLDER_BLACKLIST)
+
+    def __repr__(self) -> str:
+        return util.repr_(self)
 
     def is_blacklisted(self, filepath):
         """Test if filepath is in the blacklist.

@@ -1,7 +1,24 @@
+/**
+ * @license
+ * Copyright 2018-2021 Streamlit Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { MouseEvent, ReactNode } from "react"
 import styled, { CSSObject } from "@emotion/styled"
 import { transparentize } from "color2k"
-import { Theme } from "theme"
+import { Theme } from "src/theme"
 
 export enum Kind {
   PRIMARY = "primary",
@@ -25,6 +42,7 @@ export interface ButtonProps {
   disabled?: boolean
   fluidWidth?: boolean
   children: ReactNode
+  autoFocus?: boolean
 }
 
 type RequiredButtonProps = Required<ButtonProps>
@@ -74,8 +92,8 @@ export const StyledBaseButton = styled.button<RequiredButtonProps>(
 export const StyledPrimaryButton = styled(StyledBaseButton)<
   RequiredButtonProps
 >(({ theme }) => ({
-  backgroundColor: theme.colors.white,
-  border: `1px solid ${theme.colors.lightGray}`,
+  backgroundColor: theme.colors.lightenedBg05,
+  border: `1px solid ${theme.colors.fadedText10}`,
   "&:hover": {
     borderColor: theme.colors.primary,
     color: theme.colors.primary,
@@ -90,9 +108,7 @@ export const StyledPrimaryButton = styled(StyledBaseButton)<
     color: theme.colors.primary,
   },
   "&:disabled, &:disabled:hover, &:disabled:active": {
-    backgroundColor: theme.colors.lightGray,
-    borderColor: theme.colors.transparent,
-    color: theme.colors.gray,
+    color: theme.colors.fadedText40,
   },
 }))
 

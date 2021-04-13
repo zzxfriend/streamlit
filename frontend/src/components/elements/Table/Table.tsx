@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 import React, { ReactElement } from "react"
 import { Map as ImmutableMap } from "immutable"
 import { range } from "lodash"
-import { toFormattedString } from "lib/format"
-import { dataFrameGet, dataFrameGetDimensions } from "lib/dataFrameProto"
-import withFullScreenWrapper from "hocs/withFullScreenWrapper"
+import { toFormattedString } from "src/lib/format"
+import { dataFrameGet, dataFrameGetDimensions } from "src/lib/dataFrameProto"
+import withFullScreenWrapper from "src/hocs/withFullScreenWrapper"
 import {
   StyledTable,
   StyledEmptyTableCell,

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 import React, { PureComponent } from "react"
 import { withTheme } from "emotion-theming"
 import { FullscreenEnter, FullscreenExit } from "@emotion-icons/open-iconic"
-import Icon from "components/shared/Icon"
-import PageLayoutContext from "components/core/PageLayoutContext"
-import { Theme } from "theme"
+import Icon from "src/components/shared/Icon"
+import PageLayoutContext from "src/components/core/PageLayoutContext"
+import { Theme } from "src/theme"
 import {
   StyledFullScreenFrame,
   StyledFullScreenButton,

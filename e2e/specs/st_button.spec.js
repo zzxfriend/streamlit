@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ describe("st.button", () => {
   it("shows widget correctly", () => {
     cy.get(".stButton").should("have.length", 1);
 
-    cy.get(".stButton").matchImageSnapshot("button-widget");
+    cy.get(".stButton").matchThemedSnapshots("button-widget");
   });
 
   it("has correct default value", () => {

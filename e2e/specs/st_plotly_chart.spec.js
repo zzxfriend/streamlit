@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,5 +28,11 @@ describe("st.plotly_chart", () => {
     cy.get(".element-container .stPlotlyChart")
       .find(".modebar-btn--logo")
       .should("have.attr", "data-title", "Produced with Plotly");
+  });
+
+  it("has consistent visuals", () => {
+    cy.get(".element-container .stPlotlyChart")
+      .first()
+      .matchThemedSnapshots("st_plotly_chart");
   });
 });

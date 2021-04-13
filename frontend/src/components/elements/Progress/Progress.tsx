@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  */
 
 import React, { ReactElement } from "react"
-import { Progress as ProgressProto } from "autogen/proto"
-import ProgressBar from "components/shared/ProgressBar"
+import { Progress as ProgressProto } from "src/autogen/proto"
+import ProgressBar from "src/components/shared/ProgressBar"
 
 export interface ProgressProps {
   width: number

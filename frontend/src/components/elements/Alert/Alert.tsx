@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 
 import React, { ReactElement } from "react"
 
-import { Alert as AlertProto } from "autogen/proto"
-import StreamlitMarkdown from "components/shared/StreamlitMarkdown"
-import AlertContainer, { Kind } from "components/shared/AlertContainer"
+import { Alert as AlertProto } from "src/autogen/proto"
+import StreamlitMarkdown from "src/components/shared/StreamlitMarkdown"
+import AlertContainer, { Kind } from "src/components/shared/AlertContainer"
 
 export function getAlertKind(format: AlertProto.Format): Kind {
   switch (format) {

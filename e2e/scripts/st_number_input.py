@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,3 +23,9 @@ st.write('value 2: "', i2, '"')
 
 i3 = st.number_input("number input 3", 1, 10)
 st.write('value 3: "', i3, '"')
+
+i4 = st.number_input("number input 4", step=2)
+st.write('value 4: "', i4, '"')
+
+i5 = st.number_input("number input 5", max_value=10)
+st.write('value 5: "', i5, '"')

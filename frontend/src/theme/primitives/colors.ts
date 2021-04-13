@@ -1,9 +1,27 @@
+/**
+ * @license
+ * Copyright 2018-2021 Streamlit Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 export const colors = {
   transparent: "transparent",
   current: "currentColor",
   inherit: "inherit",
   black: "#000000",
   white: "#FFFFFF",
+  streamlitPink: "#f63366",
 
   gray10: "#fafafa",
   gray20: "#f0f2f6",
@@ -13,6 +31,7 @@ export const colors = {
   gray60: "#a3a8b8",
   gray70: "#808495",
   gray80: "#555867",
+  gray85: "#31333F",
   gray90: "#262730",
   gray100: "#0e1117",
 
@@ -48,6 +67,7 @@ export const colors = {
   yellow80: "#faca2b",
   yellow90: "#edbb16",
   yellow100: "#dea816",
+  yellow110: "#916e10",
 
   green10: "#dffde9",
   green20: "#c0fcd3",

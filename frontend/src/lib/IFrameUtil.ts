@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,9 @@ export const DEFAULT_IFRAME_SANDBOX_POLICY = [
 
   // Lets the resource navigate the top-level browsing context, but only if initiated by a user gesture.
   // "allow-top-navigation-by-user-activation",
+
+  // Lets the resource trigger downloads.
+  "allow-downloads",
 ].join(" ")
 
 /**

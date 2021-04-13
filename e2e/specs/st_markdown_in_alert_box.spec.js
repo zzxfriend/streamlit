@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ describe("info/success/warning/error boxes", () => {
     cy.get(".stAlert")
       .should("have.length", 4)
       .each((el, i) => {
-        return cy.get(el).matchImageSnapshot(`stAlert-alert-${i}`);
+        return cy.get(el).matchThemedSnapshots(`stAlert-alert-${i}`);
       });
   });
 });

@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -426,6 +426,24 @@ class ComponentRequestHandlerTest(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(404, response.code)
         self.assertEqual(
             b"components_test.test read error: Invalid content",
+            response.body,
+        )
+
+    def test_invalid_encoding_request(self):
+        """Test request failure when invalid encoded file is provided."""
+
+        with mock.patch("streamlit.components.v1.components.os.path.isdir"):
+            declare_component("test", path=PATH)
+
+        with mock.patch("streamlit.components.v1.components.open") as m:
+            m.side_effect = UnicodeDecodeError(
+                "utf-8", b"", 9, 11, "unexpected end of data"
+            )
+            response = self._request_component("components_test.test")
+
+        self.assertEqual(404, response.code)
+        self.assertEqual(
+            b"components_test.test read error: 'utf-8' codec can't decode bytes in position 9-10: unexpected end of data",
             response.body,
         )
 

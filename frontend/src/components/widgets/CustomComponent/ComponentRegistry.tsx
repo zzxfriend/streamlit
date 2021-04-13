@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { logWarning } from "lib/log"
-import { BaseUriParts, buildHttpUri } from "lib/UriUtil"
+import { logWarning } from "src/lib/log"
+import { BaseUriParts, buildHttpUri } from "src/lib/UriUtil"
 import { ComponentMessageType } from "./enums"
 
 export type ComponentMessageListener = (

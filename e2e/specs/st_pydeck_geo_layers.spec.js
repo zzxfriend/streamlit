@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ describe("st.pydeck_chart geo layers", () => {
 
     cy.get(".element-container .stDeckGlJsonChart")
       .find("#deckgl-overlay")
-      .matchImageSnapshot("h3-hexagon-layer");
+      .matchThemedSnapshots("h3-hexagon-layer");
   });
 
   it("checks if layers have tooltip", () => {

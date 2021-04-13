@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import os
 
 from tornado import gen
 
+from streamlit import util
 from streamlit.storage.abstract_storage import AbstractStorage
 from streamlit.logger import get_logger
 
@@ -33,6 +34,9 @@ class FileStorage(AbstractStorage):
         """Constructor."""
         super(FileStorage, self).__init__()
         self._dir = self._mkdir()
+
+    def __repr__(self) -> str:
+        return util.repr_(self)
 
     def _mkdir(self):
         cwd = os.getcwd()

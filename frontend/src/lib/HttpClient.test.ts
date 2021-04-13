@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
  */
 
 import axios from "axios"
-import HttpClient from "lib/HttpClient"
-import { SessionInfo } from "lib/SessionInfo"
-import { buildHttpUri } from "lib/UriUtil"
+import HttpClient from "src/lib/HttpClient"
+import { SessionInfo } from "src/lib/SessionInfo"
+import { buildHttpUri } from "src/lib/UriUtil"
 
 const MOCK_SERVER_URI = {
   host: "streamlit.mock",

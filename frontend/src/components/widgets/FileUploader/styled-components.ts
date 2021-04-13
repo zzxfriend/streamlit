@@ -1,5 +1,22 @@
+/**
+ * @license
+ * Copyright 2018-2021 Streamlit Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import styled, { CSSObject } from "@emotion/styled"
-import { Theme } from "theme"
+import { Theme } from "src/theme"
 
 export interface StyledFileDropzone {
   isDisabled: boolean
@@ -10,9 +27,7 @@ export const StyledFileDropzoneSection = styled.section<StyledFileDropzone>(
     display: "flex",
     alignItems: "center",
     padding: theme.spacing.lg,
-    backgroundColor: theme.inSidebar
-      ? theme.colors.white
-      : theme.colors.lightestGray,
+    backgroundColor: theme.colors.secondaryBg,
     borderRadius: theme.radii.md,
     ":focus": {
       outline: "none",
@@ -30,7 +45,7 @@ export const StyledFileDropzoneInstructions = styled.div(({ theme }) => ({
 
 export const StyledFileDropzoneInstructionsFileUploaderIcon = styled.span(
   ({ theme }) => ({
-    color: theme.colors.secondary,
+    color: theme.colors.darkenedBgMix60,
     marginRight: theme.spacing.lg,
   })
 )
@@ -94,7 +109,7 @@ export const StyledErrorMessage = styled.span(({ theme }) => ({
 export const StyledFileIcon = styled.div(({ theme }) => ({
   display: "flex",
   padding: theme.spacing.twoXS,
-  color: theme.colors.secondary,
+  color: theme.colors.darkenedBgMix60,
 }))
 
 export const StyledFileError = styled.small(({ theme }) => ({

@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ class SliderMixin:
         step=None,
         format=None,
         key=None,
+        help=None,
     ):
         """Display a slider widget.
 
@@ -48,7 +49,7 @@ class SliderMixin:
 
         Parameters
         ----------
-        label : str or None
+        label : str
             A short label explaining to the user what this slider is for.
         min_value : a supported type or None
             The minimum permitted value.
@@ -80,6 +81,8 @@ class SliderMixin:
             If this is omitted, a key will be generated for the widget
             based on its content. Multiple widgets of the same type may
             not share the same key.
+        help : str
+            A tooltip that gets displayed next to the slider.
 
         Returns
         -------
@@ -372,6 +375,8 @@ class SliderMixin:
         slider_proto.step = step
         slider_proto.data_type = data_type
         slider_proto.options[:] = []
+        if help is not None:
+            slider_proto.help = help
 
         ui_value = register_widget("slider", slider_proto, user_key=key)
         if ui_value:

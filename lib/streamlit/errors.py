@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from streamlit import util
 
 
 class Error(Exception):
@@ -59,6 +61,9 @@ class StreamlitAPIException(MarkdownFormattedException):
 
     pass
 
+    def __repr__(self) -> str:
+        return util.repr_(self)
+
 
 class DuplicateWidgetID(StreamlitAPIException):
     pass
@@ -78,6 +83,9 @@ class StreamlitAPIWarning(StreamlitAPIException, Warning):
 
         f = inspect.currentframe()
         self.tacked_on_stack = traceback.extract_stack(f)
+
+    def __repr__(self) -> str:
+        return util.repr_(self)
 
 
 class StreamlitDeprecationWarning(StreamlitAPIWarning):
@@ -109,3 +117,6 @@ or in your `.streamlit/config.toml`
         # For more details, please see: https://docs.streamlit.io/path/to/deprecation/docs.html
 
         super(StreamlitAPIWarning, self).__init__(message, *args)
+
+    def __repr__(self) -> str:
+        return util.repr_(self)

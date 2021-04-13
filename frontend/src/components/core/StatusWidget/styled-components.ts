@@ -1,5 +1,6 @@
 /**
- * Copyright 2018-2020 Streamlit Inc.
+ * @license
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +16,7 @@
  */
 
 import styled, { CSSObject } from "@emotion/styled"
-import { Theme } from "theme"
+import { Theme } from "src/theme"
 
 /*
   "ConnectionStatus" styles are used for displaying
@@ -65,7 +66,7 @@ export const StyledReportStatus = styled.div(({ theme }) => ({
   borderRadius: theme.radii.md,
   margin: `0 ${theme.spacing.sm} 0 0`,
   paddingLeft: theme.spacing.sm,
-  backgroundColor: "#fffd",
+  backgroundColor: theme.colors.bgColor,
   height: "1.6rem",
 }))
 

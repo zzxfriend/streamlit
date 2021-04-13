@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 
 import React from "react"
 import { ShallowWrapper } from "enzyme"
-import { shallow } from "lib/test_util"
+import { shallow } from "src/lib/test_util"
 import {
   DEFAULT_IFRAME_FEATURE_POLICY,
   DEFAULT_IFRAME_SANDBOX_POLICY,
-} from "lib/IFrameUtil"
+} from "src/lib/IFrameUtil"
 
-import { IFrame as IFrameProto } from "autogen/proto"
+import { IFrame as IFrameProto } from "src/autogen/proto"
 import IFrame, { IFrameProps } from "./IFrame"
 
 const getProps = (elementProps: Partial<IFrameProto> = {}): IFrameProps => ({

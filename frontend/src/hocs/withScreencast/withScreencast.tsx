@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 import WhichBrowser from "which-browser"
-import ScreenCastRecorder from "lib/ScreenCastRecorder"
+import ScreenCastRecorder from "src/lib/ScreenCastRecorder"
 import hoistNonReactStatics from "hoist-non-react-statics"
 import React, { PureComponent, ComponentType, ReactNode } from "react"
 
@@ -24,8 +24,8 @@ import {
   UnsupportedBrowserDialog,
   ScreencastDialog,
   VideoRecordedDialog,
-} from "hocs/withScreencast/components"
-import Countdown from "components/core/Countdown"
+} from "src/hocs/withScreencast/components"
+import Countdown from "src/components/core/Countdown"
 
 export type Steps =
   | "UNSUPPORTED"

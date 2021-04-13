@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ class SelectSliderMixin:
         value=None,
         format_func=str,
         key=None,
+        help=None,
     ):
         """
         Display a slider widget to select items from a list.
@@ -43,7 +44,7 @@ class SelectSliderMixin:
 
         Parameters
         ----------
-        label : str or None
+        label : str
             A short label explaining to the user what this slider is for.
         options : list, tuple, numpy.ndarray, pandas.Series, or pandas.DataFrame
             Labels for the slider options. All options will be cast to str
@@ -64,6 +65,8 @@ class SelectSliderMixin:
             If this is omitted, a key will be generated for the widget
             based on its content. Multiple widgets of the same type may
             not share the same key.
+        help : str
+            A tooltip that gets displayed next to the select slider.
 
         Returns
         -------
@@ -120,6 +123,8 @@ class SelectSliderMixin:
         slider_proto.step = 1  # default for index changes
         slider_proto.data_type = SliderProto.INT
         slider_proto.options[:] = [str(format_func(option)) for option in options]
+        if help is not None:
+            slider_proto.help = help
 
         ui_value = register_widget("slider", slider_proto, user_key=key)
         if ui_value:

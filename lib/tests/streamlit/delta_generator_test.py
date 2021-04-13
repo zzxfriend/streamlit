@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -152,7 +152,7 @@ class DeltaGeneratorTest(testutil.DeltaGeneratorTestCase):
                 st.empty().checkbox,
                 "streamlit.delta_generator",
                 "checkbox",
-                "(label, value=False, key=None)",
+                "(label, value=False, key=None, help=None)",
             ),
             (
                 st.empty().dataframe,

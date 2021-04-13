@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { IFrame as IFrameProto } from "autogen/proto"
+import { IFrame as IFrameProto } from "src/autogen/proto"
 import {
   DEFAULT_IFRAME_FEATURE_POLICY,
   DEFAULT_IFRAME_SANDBOX_POLICY,
-} from "lib/IFrameUtil"
+} from "src/lib/IFrameUtil"
 import React, { CSSProperties, ReactElement } from "react"
 
 export interface IFrameProps {

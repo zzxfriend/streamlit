@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ from typing import Optional
 import click
 import toml
 
+from streamlit import util
 from streamlit import env_util
 from streamlit import file_util
 from streamlit import config
@@ -115,6 +116,9 @@ class Credentials(object):
         self._conf_file = _get_credential_file_path()
 
         Credentials._singleton = self
+
+    def __repr__(self) -> str:
+        return util.repr_(self)
 
     def load(self, auto_resolve=False) -> None:
         """Load from toml file."""

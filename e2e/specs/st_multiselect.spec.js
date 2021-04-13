@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ describe("st.multiselect", () => {
       cy.get(".stMultiSelect").should("have.length", 5);
 
       cy.get(".stMultiSelect").each((el, idx) => {
-        return cy.wrap(el).matchImageSnapshot("multiselect" + idx);
+        return cy.wrap(el).matchThemedSnapshots("multiselect" + idx);
       });
     });
 
@@ -113,11 +113,17 @@ describe("st.multiselect", () => {
       cy.get(".stMultiSelect span")
         .eq(1)
         .should("have.text", "Female");
+
+      // Wait for 'data-stale' attr to go away, so the snapshot looks right.
       cy.get(".stMultiSelect")
         .eq(1)
-        .then(el => {
-          cy.wrap(el).matchImageSnapshot("multiselect-selection");
-        });
+        .parent()
+        .should("have.attr", "data-stale", "false")
+        .invoke("css", "opacity", "1");
+
+      cy.get(".stMultiSelect")
+        .eq(1)
+        .matchThemedSnapshots("multiselect-selection", { focus: "input" });
     });
 
     it("outputs the correct value", () => {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
+import { ReactWrapper } from "enzyme"
 import React from "react"
-import { mount, ReactWrapper } from "lib/test_util"
+import { mount } from "src/lib/test_util"
 import Maybe from "./Maybe"
 
 interface OuterProps {
@@ -53,6 +54,17 @@ describe("The Maybe component", () => {
       )
       const spyRender = jest.spyOn(Maybe.prototype, "render")
       component.setProps({ name: "new name" })
+      expect(spyShouldComponentUpdate).toHaveBeenCalled()
+      expect(spyRender).toHaveBeenCalled()
+    })
+
+    it("should call render() when a Maybe is first disabled", () => {
+      const spyShouldComponentUpdate = jest.spyOn(
+        Maybe.prototype,
+        "shouldComponentUpdate"
+      )
+      const spyRender = jest.spyOn(Maybe.prototype, "render")
+      component.setProps({ name: "new name", enable: false })
       expect(spyShouldComponentUpdate).toHaveBeenCalled()
       expect(spyRender).toHaveBeenCalled()
     })

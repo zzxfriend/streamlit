@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 import React, { ComponentType, ReactElement, useEffect, useState } from "react"
 import hoistNonReactStatics from "hoist-non-react-statics"
-import Pagination from "hocs/withPagination/Pagination"
-import { usePrevious } from "lib/Hooks"
+import Pagination from "src/hocs/withPagination/Pagination"
+import { usePrevious } from "src/lib/Hooks"
 
 export interface Props {
   items: any[]

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import Modal, {
   ModalBody,
   ModalFooter,
   ModalButton,
-} from "components/shared/Modal"
-import { Kind } from "components/shared/Button"
+} from "src/components/shared/Modal"
+import { Kind } from "src/components/shared/Button"
 import { StyledShortcutLabel } from "./styled-components"
 
 export interface Props {

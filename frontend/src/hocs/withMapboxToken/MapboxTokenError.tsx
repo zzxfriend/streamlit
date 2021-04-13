@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
  */
 
 import React, { ReactElement } from "react"
-import ErrorElement from "components/shared/ErrorElement"
+import ErrorElement from "src/components/shared/ErrorElement"
 import {
   MapboxTokenFetchingError,
   MapboxTokenNotProvidedError,
-} from "hocs/withMapboxToken/MapboxToken"
+} from "src/hocs/withMapboxToken/MapboxToken"
 
 interface Props {
   error: Error | MapboxTokenFetchingError | MapboxTokenNotProvidedError

@@ -1,6 +1,23 @@
+/**
+ * @license
+ * Copyright 2018-2021 Streamlit Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import hoistNonReactStatics from "hoist-non-react-statics";
 import React, { ReactNode } from "react";
-import { RenderData, Streamlit } from "./streamlit";
+import { RenderData, Streamlit, Theme } from "./streamlit";
 
 /**
  * Props passed to custom Streamlit components.
@@ -18,6 +35,9 @@ export interface ComponentProps {
    * and become re-enabled when the re-run has finished.
    */
   disabled: boolean;
+
+  /** Theme definition dictionary passed from the main client.*/
+  theme?: Theme;
 }
 
 /**
@@ -141,6 +161,7 @@ export function withStreamlitConnection(
           width={window.innerWidth}
           disabled={this.state.renderData.disabled}
           args={this.state.renderData.args}
+          theme={this.state.renderData.theme}
         />
       );
     };

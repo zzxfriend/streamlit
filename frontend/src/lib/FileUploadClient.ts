@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
  */
 
 import { CancelToken } from "axios"
-import { ExtendedFile } from "lib/FileHelper"
-import HttpClient from "lib/HttpClient"
-import { SessionInfo } from "lib/SessionInfo"
+import HttpClient from "src/lib/HttpClient"
+import { SessionInfo } from "src/lib/SessionInfo"
 
 /**
  * Handles uploading files to the server.
@@ -28,51 +27,38 @@ export class FileUploadClient extends HttpClient {
    * Upload a file to the server. It will be associated with this browser's sessionID.
    *
    * @param widgetId: the ID of the FileUploader widget that's doing the upload.
-   * @param files: the files to upload.
+   * @param file: the files to upload.
    * @param onUploadProgress: an optional function that will be called repeatedly with progress events during the upload.
    * @param cancelToken: an optional axios CancelToken that can be used to cancel the in-progress upload.
-   * @param replace: an optional boolean to indicate if the file should replace existing files associated with the widget.
+   *
+   * @return a Promise<number> that resolves with the file's unique ID, as assigned by the server.
    */
-  public async uploadFiles(
+  public async uploadFile(
     widgetId: string,
-    files: ExtendedFile[],
+    file: File,
     onUploadProgress?: (progressEvent: any) => void,
-    cancelToken?: CancelToken,
-    replace?: boolean
-  ): Promise<void> {
+    cancelToken?: CancelToken
+  ): Promise<number> {
     const form = new FormData()
     form.append("sessionId", SessionInfo.current.sessionId)
     form.append("widgetId", widgetId)
-    if (replace) form.append("replace", "true")
-    for (const file of files) {
-      form.append(file.id || file.name, file, file.name)
-    }
+    form.append(file.name, file)
 
-    await this.request("upload_file", {
+    return this.request<number>("upload_file", {
       cancelToken,
       method: "POST",
       data: form,
+      responseType: "text",
       onUploadProgress,
-    })
-  }
-
-  public async delete(widgetId: string, fileId: string): Promise<void> {
-    await this.request(
-      `upload_file/${SessionInfo.current.sessionId}/${widgetId}/${fileId}`,
-      { method: "DELETE" }
-    )
-  }
-
-  public async updateFileCount(
-    widgetId: string,
-    fileCount: number
-  ): Promise<void> {
-    await this.request(
-      `upload_file/${SessionInfo.current.sessionId}/${widgetId}`,
-      {
-        method: "PUT",
-        data: { totalFiles: fileCount },
+    }).then(rsp => {
+      // Sanity check. Axios should be returning a number here.
+      if (typeof rsp.data === "number") {
+        return rsp.data
       }
-    )
+
+      throw new Error(
+        `Bad uploadFile response: expected a number but got '${rsp.data}'`
+      )
+    })
   }
 }

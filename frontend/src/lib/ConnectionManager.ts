@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { BackMsg, ForwardMsg, StaticManifest } from "autogen/proto"
-import { BaseUriParts, getWindowBaseUriParts } from "lib/UriUtil"
+import { BackMsg, ForwardMsg, StaticManifest } from "src/autogen/proto"
+import { BaseUriParts, getWindowBaseUriParts } from "src/lib/UriUtil"
 import { ReactNode } from "react"
 import url from "url"
 import { IS_SHARED_REPORT } from "./baseconsts"

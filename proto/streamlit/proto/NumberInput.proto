@@ -1,5 +1,5 @@
 /**
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ message NumberInput {
   double step = 15;
   double min = 16;
   double max = 17;
+  string help = 18;
 
   reserved 3, 4, 5, 6, 7, 9, 10;
 }

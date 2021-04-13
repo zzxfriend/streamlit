@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,12 +22,8 @@ from .utils import register_widget
 
 
 class ColorPickerMixin:
-    def color_picker(self, label, value=None, key=None):
+    def color_picker(self, label, value=None, key=None, help=None):
         """Display a color picker widget.
-
-        Note: This is a beta feature. See
-        https://docs.streamlit.io/en/latest/api.html#pre-release-features for more
-        information.
 
         Parameters
         ----------
@@ -41,6 +37,8 @@ class ColorPickerMixin:
             If this is omitted, a key will be generated for the widget
             based on its content. Multiple widgets of the same type may
             not share the same key.
+        help : str
+            A tooltip that gets displayed next to the color picker.
 
         Returns
         -------
@@ -82,6 +80,8 @@ class ColorPickerMixin:
         color_picker_proto = ColorPickerProto()
         color_picker_proto.label = label
         color_picker_proto.default = str(value)
+        if help is not None:
+            color_picker_proto.help = help
 
         ui_value = register_widget("color_picker", color_picker_proto, user_key=key)
         current_value = ui_value if ui_value is not None else value

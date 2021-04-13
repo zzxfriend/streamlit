@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import textwrap
 from typing import Any, Callable, Optional
 
 from streamlit.errors import DeprecationError
+from streamlit import util
 
 
 class ConfigOption(object):
@@ -143,7 +144,7 @@ class ConfigOption(object):
             # Matching text comprised of letters and numbers that begins
             # with a lowercase letter with an optional "_" preceeding it.
             # Examples: "_section", "section1"
-            "\_?[a-z][a-z0-9]*"
+            "\_?[a-z][a-zA-Z0-9]*"
             ")"
             # Seperator between groups
             "\."
@@ -182,6 +183,9 @@ class ConfigOption(object):
             self.deprecation_text = textwrap.dedent(deprecation_text)
 
         self.set_value(default_val)
+
+    def __repr__(self) -> str:
+        return util.repr_(self)
 
     def __call__(self, get_val_func):
         """Assign a function to compute the value for this option.

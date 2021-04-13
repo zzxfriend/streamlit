@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,27 @@
 
 import copy from "copy-to-clipboard"
 import React, { ReactElement, ReactNode } from "react"
-import ProgressBar from "components/shared/ProgressBar"
-import { Kind } from "components/shared/Button"
+import ProgressBar from "src/components/shared/ProgressBar"
+import { Kind } from "src/components/shared/Button"
 import Modal, {
   ModalHeader,
   ModalBody,
   ModalFooter,
   ModalButton,
-} from "components/shared/Modal"
+} from "src/components/shared/Modal"
 import { HotKeys } from "react-hotkeys"
 
 import {
   ScriptChangedDialog,
   Props as ScriptChangedDialogProps,
-} from "components/core/StreamlitDialog/ScriptChangedDialog"
-import { IException } from "autogen/proto"
-import { SessionInfo } from "lib/SessionInfo"
-import { STREAMLIT_HOME_URL } from "urls"
+} from "src/components/core/StreamlitDialog/ScriptChangedDialog"
+import { IException } from "src/autogen/proto"
+import { SessionInfo } from "src/lib/SessionInfo"
+import { STREAMLIT_HOME_URL } from "src/urls"
 import { Props as SettingsDialogProps, SettingsDialog } from "./SettingsDialog"
+import ThemeCreatorDialog, {
+  Props as ThemeCreatorDialogProps,
+} from "./ThemeCreatorDialog"
 
 import {
   StyledUploadFirstLine,
@@ -53,6 +56,10 @@ interface ScriptChangedProps extends ScriptChangedDialogProps {
   type: DialogType.SCRIPT_CHANGED
 }
 
+interface ThemeCreatorProps extends ThemeCreatorDialogProps {
+  type: DialogType.THEME_CREATOR
+}
+
 export type DialogProps =
   | AboutProps
   | ClearCacheProps
@@ -60,6 +67,7 @@ export type DialogProps =
   | SettingsProps
   | ScriptChangedProps
   | ScriptCompileErrorProps
+  | ThemeCreatorProps
   | UploadProgressProps
   | UploadedProps
   | WarningProps
@@ -71,6 +79,7 @@ export enum DialogType {
   SETTINGS = "settings",
   SCRIPT_CHANGED = "scriptChanged",
   SCRIPT_COMPILE_ERROR = "scriptCompileError",
+  THEME_CREATOR = "themeCreator",
   UPLOAD_PROGRESS = "uploadProgress",
   UPLOADED = "uploaded",
   WARNING = "warning",
@@ -90,6 +99,8 @@ export function StreamlitDialog(dialogProps: DialogProps): ReactNode {
       return <ScriptChangedDialog {...dialogProps} />
     case DialogType.SCRIPT_COMPILE_ERROR:
       return scriptCompileErrorDialog(dialogProps)
+    case DialogType.THEME_CREATOR:
+      return <ThemeCreatorDialog {...dialogProps} />
     case DialogType.UPLOAD_PROGRESS:
       return uploadProgressDialog(dialogProps)
     case DialogType.UPLOADED:
@@ -160,23 +171,29 @@ function clearCacheDialog(props: ClearCacheProps): ReactElement {
   // component here but it's not working without it
   return (
     <HotKeys handlers={keyHandlers} attach={window}>
-      <Modal isOpen onClose={props.onClose}>
-        <ModalHeader>Clear Cache</ModalHeader>
-        <ModalBody>
-          <div>
-            Are you sure you want to clear the <code>@st.cache</code> function
-            cache?
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <ModalButton kind={Kind.SECONDARY} onClick={props.onClose}>
-            Cancel
-          </ModalButton>
-          <ModalButton kind={Kind.PRIMARY} onClick={props.confirmCallback}>
-            Clear cache
-          </ModalButton>
-        </ModalFooter>
-      </Modal>
+      <div data-testid="stClearCacheDialog">
+        <Modal isOpen onClose={props.onClose}>
+          <ModalHeader>Clear Cache</ModalHeader>
+          <ModalBody>
+            <div>
+              Are you sure you want to clear the <code>@st.cache</code>{" "}
+              function cache?
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <ModalButton kind={Kind.SECONDARY} onClick={props.onClose}>
+              Cancel
+            </ModalButton>
+            <ModalButton
+              autoFocus
+              kind={Kind.PRIMARY}
+              onClick={props.confirmCallback}
+            >
+              Clear cache
+            </ModalButton>
+          </ModalFooter>
+        </Modal>
+      </div>
     </HotKeys>
   )
 }

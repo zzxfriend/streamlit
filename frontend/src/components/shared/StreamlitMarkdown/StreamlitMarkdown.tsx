@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,32 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, ReactNode, Fragment, PureComponent } from "react"
+import React, {
+  ReactElement,
+  ReactNode,
+  Fragment,
+  PureComponent,
+  CSSProperties,
+} from "react"
 import ReactMarkdown from "react-markdown"
 import { once } from "lodash"
 // @ts-ignore
 import htmlParser from "react-markdown/plugins/html-parser"
 // @ts-ignore
-import { BlockMath, InlineMath } from "react-katex"
+import Tex from "@matejmazur/react-katex"
 // @ts-ignore
 import RemarkMathPlugin from "remark-math"
 import { Link as LinkIcon } from "react-feather"
 // @ts-ignore
 import RemarkEmoji from "remark-emoji"
-import PageLayoutContext from "components/core/PageLayoutContext"
-import CodeBlock from "components/elements/CodeBlock/"
+import PageLayoutContext from "src/components/core/PageLayoutContext"
+import CodeBlock from "src/components/elements/CodeBlock/"
+import IsSidebarContext from "src/components/core/Sidebar/IsSidebarContext"
 import {
   StyledStreamlitMarkdown,
   StyledLinkIconContainer,
   StyledLinkIcon,
+  StyledHeaderContent,
 } from "./styled-components"
 
 import "katex/dist/katex.min.css"
@@ -48,6 +56,7 @@ export interface Props {
    * any HTML will be escaped in the output.
    */
   allowHTML: boolean
+  style?: CSSProperties
 }
 
 /**
@@ -95,6 +104,7 @@ function HeadingWithAnchor({
   anchor: propsAnchor,
   children,
 }: HeadingWithAnchorProps): ReactElement {
+  const isSidebar = React.useContext(IsSidebarContext)
   const [elementId, setElementId] = React.useState(propsAnchor)
   const [target, setTarget] = React.useState<HTMLElement | null>(null)
 
@@ -102,6 +112,10 @@ function HeadingWithAnchor({
     addReportFinishedHandler,
     removeReportFinishedHandler,
   } = React.useContext(PageLayoutContext)
+
+  if (isSidebar) {
+    return React.createElement(tag, {}, children)
+  }
 
   const onReportFinished = React.useCallback(() => {
     if (target !== null) {
@@ -140,10 +154,10 @@ function HeadingWithAnchor({
     <StyledLinkIconContainer>
       {elementId && (
         <StyledLinkIcon href={`#${elementId}`}>
-          <LinkIcon size="20" color="#ccc" />
+          <LinkIcon size="18" />
         </StyledLinkIcon>
       )}
-      {children}
+      <StyledHeaderContent>{children}</StyledHeaderContent>
     </StyledLinkIconContainer>
   )
 }
@@ -157,8 +171,10 @@ function CustomParsedHtml(props: CustomParsedHtmlProps): ReactElement {
     element: { type, props: elementProps },
   } = props
 
+  const isSidebar = React.useContext(IsSidebarContext)
+
   const headingElements = ["h1", "h2", "h3", "h4", "h5", "h6"]
-  if (!headingElements.includes(type)) {
+  if (isSidebar || !headingElements.includes(type)) {
     // casting to any because ReactMarkdown's types are funky
     // but this just means "call the original renderer provided by ReactMarkdown"
     return (ReactMarkdown.renderers.parsedHtml as any)(props)
@@ -188,17 +204,17 @@ class StreamlitMarkdown extends PureComponent<Props> {
   }
 
   public render = (): ReactNode => {
-    const { source, allowHTML } = this.props
+    const { source, allowHTML, style } = this.props
 
     const renderers = {
       code: CodeBlock,
       link: linkWithTargetBlank,
       linkReference: linkReferenceHasParens,
       inlineMath: (props: { value: string }): ReactElement => (
-        <InlineMath>{props.value}</InlineMath>
+        <Tex>{props.value}</Tex>
       ),
       math: (props: { value: string }): ReactElement => (
-        <BlockMath>{props.value}</BlockMath>
+        <Tex block>{props.value}</Tex>
       ),
       heading: CustomHeading,
       parsedHtml: CustomParsedHtml,
@@ -208,7 +224,7 @@ class StreamlitMarkdown extends PureComponent<Props> {
     const astPlugins = allowHTML ? [htmlParser()] : []
 
     return (
-      <StyledStreamlitMarkdown data-testid="stMarkdownContainer">
+      <StyledStreamlitMarkdown style={style} data-testid="stMarkdownContainer">
         <ReactMarkdown
           source={source}
           escapeHtml={!allowHTML}

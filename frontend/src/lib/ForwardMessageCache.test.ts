@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import { ForwardMsg } from "autogen/proto"
+import { ForwardMsg } from "src/autogen/proto"
 import fetchMock from "fetch-mock"
-import { ForwardMsgCache } from "lib/ForwardMessageCache"
-import { buildHttpUri } from "lib/UriUtil"
+import { ForwardMsgCache } from "src/lib/ForwardMessageCache"
+import { buildHttpUri } from "src/lib/UriUtil"
 
 const MOCK_SERVER_URI = {
   host: "streamlit.mock",

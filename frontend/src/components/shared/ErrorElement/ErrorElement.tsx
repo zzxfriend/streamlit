@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 import React, { ReactElement } from "react"
-import AlertContainer, { Kind } from "components/shared/AlertContainer"
+import AlertContainer, { Kind } from "src/components/shared/AlertContainer"
 import { StyledPreError } from "./styled-components"
 
 export interface ErrorElementProps {

@@ -1,4 +1,4 @@
-# Copyright 2018-2020 Streamlit Inc.
+# Copyright 2018-2021 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ from streamlit.proto.Empty_pb2 import Empty as EmptyProto
 from tests import testutil
 
 NEW_REPORT_MSG = ForwardMsg()
-NEW_REPORT_MSG.new_report.initialize.config.sharing_enabled = True
+NEW_REPORT_MSG.new_report.config.sharing_enabled = True
 NEW_REPORT_MSG.metadata.delta_path[:] = make_delta_path(RootContainer.MAIN, (), 0)
 
 TEXT_DELTA_MSG = ForwardMsg()

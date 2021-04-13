@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2018-2021 Streamlit Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React, { ReactNode, ReactElement, FunctionComponent } from "react"
 import { useTheme } from "emotion-theming"
 import {
@@ -7,9 +24,8 @@ import {
   ModalFooter as UIModalFooter,
   ModalProps,
 } from "baseui/modal"
-import Button, { ButtonProps } from "components/shared/Button"
-import { Theme } from "theme"
-import { transparentize } from "color2k"
+import Button, { ButtonProps } from "src/components/shared/Button"
+import { Theme } from "src/theme"
 import { StyledModalButton } from "./styled-components"
 
 export interface ModalHeaderProps {
@@ -17,7 +33,7 @@ export interface ModalHeaderProps {
 }
 
 function ModalHeader({ children }: ModalHeaderProps): ReactElement {
-  const { colors, fonts, fontSizes, spacing }: Theme = useTheme()
+  const { colors, genericFonts, fontSizes, spacing }: Theme = useTheme()
 
   return (
     <UIModalHeader
@@ -27,16 +43,18 @@ function ModalHeader({ children }: ModalHeaderProps): ReactElement {
         marginRight: spacing.none,
         marginBottom: spacing.none,
         paddingTop: spacing.lg,
-        paddingRight: spacing.lg,
+        paddingRight: spacing.xl,
         paddingBottom: spacing.lg,
-        paddingLeft: spacing.lg,
-        borderBottom: `1px solid ${colors.lightGray}`,
-        fontFamily: fonts.sansSerif,
+        paddingLeft: spacing.xl,
+        borderBottom: `1px solid ${colors.fadedText10}`,
+        fontFamily: genericFonts.bodyFont,
         fontSize: fontSizes.lg,
         margin: spacing.none,
-        fontWeight: 300,
         lineHeight: 1.5,
         textTransform: "none",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
       }}
     >
       {children}
@@ -58,10 +76,10 @@ function ModalBody({ children }: ModalBodyProps): ReactElement {
         marginLeft: spacing.none,
         marginRight: spacing.none,
         marginBottom: spacing.none,
-        paddingTop: spacing.lg,
-        paddingRight: spacing.lg,
-        paddingBottom: spacing.lg,
-        paddingLeft: spacing.lg,
+        paddingTop: spacing.xl,
+        paddingRight: spacing.xl,
+        paddingBottom: spacing.xl,
+        paddingLeft: spacing.xl,
         color: colors.bodyText,
         fontSize: fontSizes.md,
       }}
@@ -89,7 +107,7 @@ function ModalFooter({ children }: ModalFooterProps): ReactElement {
         paddingRight: spacing.md,
         paddingBottom: spacing.md,
         paddingLeft: spacing.md,
-        borderTop: `1px solid ${colors.lightGray}`,
+        borderTop: `1px solid ${colors.fadedText10}`,
       }}
     >
       <div className="ModalBody">{children}</div>
@@ -104,7 +122,7 @@ const ModalButton: FunctionComponent<ButtonProps> = buttonProps => (
 )
 
 function Modal(props: ModalProps): ReactElement {
-  const { colors, spacing }: Theme = useTheme()
+  const { spacing, colors }: Theme = useTheme()
 
   return (
     <UIModal
@@ -122,11 +140,15 @@ function Modal(props: ModalProps): ReactElement {
             paddingTop: "3rem",
           },
         },
+        Dialog: {
+          style: {
+            border: `1px solid ${colors.fadedText10}`,
+          },
+        },
         Close: {
           style: {
-            top: spacing.lg,
+            top: spacing.xl, // Trying to center the button on the available space.
             right: spacing.lg,
-            color: transparentize(colors.black, 0.5),
           },
         },
       }}

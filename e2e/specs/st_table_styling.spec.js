@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2020 Streamlit Inc.
+ * Copyright 2018-2021 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ describe("st.table styling", () => {
 
     cy.get("[data-testid='stTable']")
       .eq(0)
-      .matchImageSnapshot("table-unstyled");
+      .matchThemedSnapshots("table-unstyled");
   });
 
   it("displays table with custom formatted cells", () => {
@@ -46,7 +46,7 @@ describe("st.table styling", () => {
 
     cy.get("[data-testid='stTable']")
       .eq(1)
-      .matchImageSnapshot("table-formatted-cells");
+      .matchThemedSnapshots("table-formatted-cells");
   });
 
   it("displays table with colored cells", () => {
@@ -65,7 +65,7 @@ describe("st.table styling", () => {
 
     cy.get("[data-testid='stTable']")
       .eq(2)
-      .matchImageSnapshot("table-colored-cells");
+      .matchThemedSnapshots("table-colored-cells");
   });
 
   it("displays table with differently styled rows", () => {
@@ -92,6 +92,6 @@ describe("st.table styling", () => {
 
     cy.get("[data-testid='stTable']")
       .eq(3)
-      .matchImageSnapshot("table-styled-rows");
+      .matchThemedSnapshots("table-styled-rows");
   });
 });
