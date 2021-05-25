@@ -31,6 +31,8 @@ from streamlit.logger import get_logger
 
 from streamlit.elements.utils import NoValue
 from streamlit.elements.balloons import BalloonsMixin
+from streamlit.elements.beta_altair import BetaAltairMixin
+from streamlit.elements.beta_vega_lite import BetaVegaLiteMixin
 from streamlit.elements.button import ButtonMixin
 from streamlit.elements.markdown import MarkdownMixin
 from streamlit.elements.text import TextMixin
@@ -76,7 +78,19 @@ MAX_DELTA_BYTES = 14 * 1024 * 1024  # 14MB
 
 # List of Streamlit commands that perform a Pandas "melt" operation on
 # input dataframes.
-DELTAS_TYPES_THAT_MELT_DATAFRAMES = ("line_chart", "area_chart", "bar_chart")
+DELTAS_TYPES_THAT_MELT_DATAFRAMES = (
+    "line_chart",
+    "area_chart",
+    "bar_chart",
+)
+
+# List of Streamlit commands that perform a Pandas "melt" operation on
+# input dataframes.
+BETA_DELTAS_TYPES_THAT_MELT_DATAFRAMES = (
+    "beta_line_chart",
+    "beta_area_chart",
+    "beta_bar_chart",
+)
 
 
 class DeltaGenerator(
@@ -84,6 +98,8 @@ class DeltaGenerator(
     AltairMixin,
     ArrowMixin,
     BalloonsMixin,
+    BetaAltairMixin,
+    BetaVegaLiteMixin,
     BokehMixin,
     ButtonMixin,
     CheckboxMixin,
@@ -357,6 +373,9 @@ class DeltaGenerator(
         proto_type = delta_type
         if proto_type in DELTAS_TYPES_THAT_MELT_DATAFRAMES:
             proto_type = "vega_lite_chart"
+
+        if proto_type in BETA_DELTAS_TYPES_THAT_MELT_DATAFRAMES:
+            proto_type = "beta_vega_lite_chart"
 
         # Copy the marshalled proto into the overall msg proto
         msg = ForwardMsg_pb2.ForwardMsg()

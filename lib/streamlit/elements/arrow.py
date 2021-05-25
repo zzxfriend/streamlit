@@ -62,6 +62,69 @@ class ArrowMixin:
             self.dg._enqueue("beta_table", proto),
         )
 
+    def beta_dataframe(self, data=None, width=None, height=None):
+        """Display a dataframe as an interactive table.
+
+        Parameters
+        ----------
+        data : pandas.DataFrame, pandas.Styler, numpy.ndarray, Iterable, dict, or None
+            The data to display.
+
+            If 'data' is a pandas.Styler, it will be used to style its
+            underyling DataFrame. Streamlit supports custom cell
+            values and colors. (It does not support some of the more exotic
+            pandas styling features, like bar charts, hovering, and captions.)
+            Styler support is experimental!
+        width : int or None
+            Desired width of the UI element expressed in pixels. If None, a
+            default width based on the page width is used.
+        height : int or None
+            Desired height of the UI element expressed in pixels. If None, a
+            default height is used.
+
+        Examples
+        --------
+        >>> df = pd.DataFrame(
+        ...    np.random.randn(50, 20),
+        ...    columns=('col %d' % i for i in range(20)))
+        ...
+        >>> st.beta_dataframe(df)  # Same as st.write(df)
+
+        .. output::
+           https://static.streamlit.io/0.25.0-2JkNY/index.html?id=165mJbzWdAC8Duf8a4tjyQ
+           height: 330px
+
+        >>> st.beta_dataframe(df, 200, 100)
+
+        You can also pass a Pandas Styler object to change the style of
+        the rendered DataFrame:
+
+        >>> df = pd.DataFrame(
+        ...    np.random.randn(10, 20),
+        ...    columns=('col %d' % i for i in range(20)))
+        ...
+        >>> st.beta_dataframe(df.style.highlight_max(axis=0))
+
+        .. output::
+           https://static.streamlit.io/0.29.0-dV1Y/index.html?id=Hb6UymSNuZDzojUNybzPby
+           height: 285px
+
+        """
+        # If pandas.Styler uuid is not provided, a hash of the position
+        # of the element will be used. This will cause a rerender of the table
+        # when the position of the element is changed.
+        delta_path = self.dg._get_delta_path_str()
+        default_uuid = str(hash(delta_path))
+
+        proto = ArrowProto()
+        marshall(proto, data, default_uuid)
+        return cast(
+            "streamlit.delta_generator.DeltaGenerator",
+            self.dg._enqueue(
+                "beta_data_frame", proto, element_width=width, element_height=height
+            ),
+        )
+
     @property
     def dg(self) -> "streamlit.delta_generator.DeltaGenerator":
         """Get our DeltaGenerator."""

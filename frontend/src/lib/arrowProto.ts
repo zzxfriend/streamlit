@@ -19,12 +19,14 @@
 // Do NOT use this in production.
 
 import { Column, Table } from "apache-arrow"
-import { isEqual, range, unzip } from "lodash"
+import { range, unzip } from "lodash"
+import { IArrow } from "src/autogen/proto"
+import { Columns, Data, Index, IndexType, Quiver } from "./Quiver"
 
-export interface DataTable {
-  index: any
-  columns: any[][]
-  data: any[][]
+export interface DataFrame {
+  index: Index
+  columns: Columns
+  data: Data
   styler?: Styler
 }
 
@@ -50,11 +52,10 @@ interface SchemaColumn {
   pandas_type: string
 }
 
-enum IndexTypes {
+export enum IndexTypes {
   UnicodeIndex = "unicode",
   RangeIndex = "range",
   CategoricalIndex = "categorical",
-  MultiIndex = "multiIndex",
   IntervalIndex = "interval[int64]",
   DatetimeIndex = "datetime",
   TimedeltaIndex = "time",
@@ -64,30 +65,57 @@ enum IndexTypes {
   Float64Index = "float64",
 }
 
+interface IndexData {
+  data: any[]
+  type: IndexType
+}
+
 export interface Styler {
-  uuid?: string
+  uuid: string
   caption?: string
   styles?: string
-  displayValues?: any
+  displayValues?: Quiver
 }
 
-export function toHumanFormat(table: any): DataTable {
-  const schema = getSchema(table)
-  const columns = getColumns(schema)
-  const data = getData(table, columns)
-  const index = {
-    data: getIndex(table, schema),
-    type: getIndexType(schema),
-  }
+export function parseTable(element?: IArrow | null): DataFrame {
+  try {
+    const table = Table.from(element?.data)
+    const tableStyler = element?.styler
 
-  return {
-    index,
-    columns,
-    data,
+    const schema = getSchema(table)
+    const columns = getColumns(schema)
+    const index = {
+      data: getIndex(table, schema),
+      type: getIndexType(schema),
+    }
+    const data = {
+      data: getData(table, columns),
+      type: getDataColumnType(table, schema),
+    }
+    const styler = tableStyler
+      ? {
+          caption: tableStyler.caption,
+          displayValues: new Quiver(
+            parseTable({ data: tableStyler.displayValues })
+          ),
+          styles: tableStyler.styles,
+          uuid: tableStyler.uuid,
+        }
+      : undefined
+
+    return {
+      index,
+      columns,
+      data,
+      // @ts-ignore
+      styler,
+    }
+  } catch (e) {
+    throw new Error(e)
   }
 }
 
-function getSchema(table: Table<any>): Schema {
+function getSchema(table: Table): Schema {
   const schema = table.schema.metadata.get("pandas")
   if (schema == null) {
     throw new Error("Table schema is missing.")
@@ -95,19 +123,19 @@ function getSchema(table: Table<any>): Schema {
   return JSON.parse(schema)
 }
 
-function getIndex(table: Table<any>, schema: Schema): string[][] {
+function getIndex(table: Table, schema: Schema): any[][] {
   return schema.index_columns.map(field => {
     const isRangeIndex = typeof field === "object" && field.kind === "range"
     if (isRangeIndex) {
       const { start, stop, step } = field as RangeIndex
-      return range(start, stop, step).map(String)
+      return range(start, stop, step)
     }
-    const column = table.getColumn(field as string)
-    return getColumnData(column).map(String)
+    const column = table.getColumn(field as any)
+    return getColumnData(column)
   })
 }
 
-function getIndexType(schema: Schema): any {
+function getIndexType(schema: Schema): IndexType[] {
   return schema.index_columns.map(indexName => {
     if (isRangeIndex(indexName)) {
       return {
@@ -126,8 +154,8 @@ function getIndexType(schema: Schema): any {
     return {
       name:
         indexColumn?.pandas_type === "object"
-          ? indexColumn?.numpy_type
-          : indexColumn?.pandas_type,
+          ? (indexColumn?.numpy_type as string)
+          : (indexColumn?.pandas_type as string),
       meta: indexColumn?.metadata,
     }
   })
@@ -152,83 +180,215 @@ function getColumns(schema: Schema): string[][] {
   )
 }
 
-function getData(table: Table<any>, columns: string[][]): any[][] {
+function getData(table: Table, columns: string[][]): any[][] {
   const rows = table.length
   const cols = columns.length > 0 ? columns[0].length : 0
-
   return range(0, rows).map(rowIndex =>
     range(0, cols).map(columnIndex =>
-      table
-        .getColumnAt(columnIndex)
-        ?.get(rowIndex)
-        ?.toString()
+      table.getColumnAt(columnIndex)?.get(rowIndex)
     )
   )
 }
 
-function getColumnData(column: Column): any[] {
+function getDataColumnType(table: Table, schema: Schema): string[] {
+  const rows = table.length
+  return rows > 0
+    ? schema.columns
+        .filter(column => !schema.index_columns.includes(column.field_name))
+        .map(column => column.pandas_type)
+    : []
+}
+
+function getColumnData(column: Column): string[] {
   return range(0, column.length).map(rowIndex => column.get(rowIndex))
+}
+
+export function concatTables(df1: Quiver, df2: Quiver): Quiver {
+  if (df1.styler || df2.styler) {
+    throw new Error(`Cannot concatenate dataframes with styler.`)
+  }
+
+  // Special case if df1 is empty.
+  if (isEmptyDf(df1)) {
+    return df2
+  }
+
+  // Special case if df2 is empty.
+  if (isEmptyDf(df2)) {
+    return df1
+  }
+
+  try {
+    // Always returns first df columns
+    const { columns } = df1
+    const index = concatIndices(df1.index, df2.index)
+    const data = concatData(df1.data, df2.data)
+
+    return new Quiver({ index, data, columns })
+  } catch (e) {
+    throw new Error(e.message)
+  }
+}
+
+function concatIndices(firstIndices: Index, secondIndices: Index): Index {
+  // Special case if `firstIndices` is empty.
+  if (firstIndices.data[0].length === 0) {
+    return secondIndices
+  }
+
+  // Otherwise, make sure the types match.
+  if (!sameIndexTypes(firstIndices.type, secondIndices.type)) {
+    throw new Error(
+      `Cannot concatenate index type ${JSON.stringify(
+        firstIndices.type
+      )} with ${JSON.stringify(secondIndices.type)}.`
+    )
+  }
+
+  // Concat the indices.
+  return firstIndices.data.reduce(
+    (newIndex: Index, firstIndexData: string[], index: number) => {
+      const concatenatedIndex = concatIndex(
+        firstIndexData,
+        secondIndices.data[index],
+        firstIndices.type[index]
+      )
+      newIndex.data.push(concatenatedIndex.data)
+      newIndex.type.push(concatenatedIndex.type)
+      return newIndex
+    },
+    { data: [], type: [] }
+  )
+}
+
+function concatIndex(
+  firstIndex: string[],
+  secondIndex: string[],
+  indexType: IndexType
+): IndexData {
+  // Special case for RangeIndex.
+  if (indexType.name === IndexTypes.RangeIndex) {
+    return concatRangeIndex(firstIndex, secondIndex, indexType)
+  }
+
+  // For the rest cases.
+  return concatAnyIndex(firstIndex, secondIndex, indexType)
+}
+
+function concatRangeIndex(
+  firstIndex: string[],
+  secondIndex: string[],
+  indexType: IndexType
+): IndexData {
+  let newStop = indexType.meta.stop
+
+  return secondIndex.reduce(
+    (newIndex: IndexData) => {
+      newIndex.data.push(newStop)
+      newStop += indexType.meta.step
+      newIndex.type.meta.stop = newStop
+      return newIndex
+    },
+    { data: firstIndex, type: indexType }
+  )
+}
+
+function concatAnyIndex(
+  firstIndex: string[],
+  secondIndex: string[],
+  indexType: IndexType
+): IndexData {
+  const concatenatedIndex = firstIndex.concat(secondIndex)
+
+  // Special case for CategoricalIndex, num_categories must be increased in meta
+  if (indexType.name === IndexTypes.CategoricalIndex) {
+    indexType.meta.num_categories += secondIndex.length
+  }
+
+  return { data: concatenatedIndex, type: indexType }
+}
+
+function concatData(firstData: Data, secondData: Data): Data {
+  // Make sure data types match.
+  if (!sameDataColumnTypes(firstData.type, secondData.type)) {
+    throw new Error(
+      `Cannot concatenate data type ${JSON.stringify(
+        firstData.type
+      )} with ${JSON.stringify(secondData.type)}.`
+    )
+  }
+
+  const numberOfColumns = firstData.type.length
+
+  return {
+    data: firstData.data.concat(
+      secondData.data.map((data: string[]) => data.slice(0, numberOfColumns))
+    ),
+    type: firstData.type,
+  }
+}
+
+function sameIndexTypes(
+  firstType: IndexType[],
+  secondType: IndexType[]
+): boolean {
+  // Make sure both indices have same dimensions.
+  if (firstType.length !== secondType.length) {
+    return false
+  }
+
+  return firstType.every(
+    (firstTypeValue: IndexType, index: number) =>
+      firstTypeValue.name === secondType[index].name
+  )
+}
+
+function sameDataColumnTypes(
+  firstType: string[],
+  secondType: string[]
+): boolean {
+  return firstType.every(
+    (firstTypeValue: string, index: number) =>
+      firstTypeValue === secondType[index]
+  )
 }
 
 function isRangeIndex(field: string | RangeIndex): boolean {
   return typeof field === "object" && field.kind === "range"
 }
 
-export function concatTables(df1: any, df2: any): any {
-  // Special case if df1 is empty.
-  if (df1.data.length === 0) {
-    return df2
+export function compareValues(a: any, b: any, type: string): number {
+  if (type === "unicode") {
+    return compareStrings(a, b)
   }
 
-  // Otherwise, make sure the types match.
-  // (HK) TODO: Fix this check for RangeIndex with different steps.
-  if (!isEqual(df1.index.type, df2.index.type)) {
-    throw new Error(
-      `Cannot concatenate ${df1.index.type.join()} with ${df2.index.type.join()}.`
-    )
-  }
-
-  const index = concatIndices(df1.index, df2.index)
-  const data = concatData(df1.data, df2.data)
-  return { index, data }
+  return compareAny(a, b)
 }
 
-function concatIndices(index1: any, index2: any): any {
-  // NOTE: The current implementation works only for single indices.
-  // (HK) TODO: Add multi-index support.
-  const indexType = index1.type[0].name
-
-  switch (indexType) {
-    case IndexTypes.RangeIndex:
-      return concatRangeIndex(index1, index2)
-    default:
-      // Patch for now.
-      // (HK) TODO: Add support for different types of indices.
-      return concatAnyIndex(index1, index2)
-  }
-}
-
-function concatRangeIndex(index1: any, index2: any): any {
-  // @ts-ignore
-  // eslint-disable-next-line
-  let { step, stop } = index1.type[0].meta
-  index2.data[0].forEach(() => {
-    index1.data[0].push(stop)
-    stop += step
+function compareStrings(a: string, b: string): number {
+  const STRING_COLLATOR = new Intl.Collator("en", {
+    numeric: false,
+    sensitivity: "base",
   })
-
-  index1.type[0].meta.stop = stop
-
-  return index1
+  // using a Collator is faster than string.localeCompare:
+  // https://stackoverflow.com/questions/14677060/400x-sorting-speedup-by-switching-a-localecompareb-to-ab-1ab10/52369951#52369951
+  return STRING_COLLATOR.compare(a, b)
 }
 
-function concatAnyIndex(index1: any, index2: any): any {
-  index2.data[0].forEach((value: any) => {
-    index1.data[0].push(value)
-  })
-  return index1
+function compareAny(a: any, b: any): number {
+  if (a < b) {
+    return -1
+  }
+  if (a > b) {
+    return 1
+  }
+  return 0
 }
 
-function concatData(data1: any, data2: any): any {
-  return data1.concat(data2)
+function isEmptyDf(df: Quiver): boolean {
+  return (
+    df.data.data.length === 0 &&
+    df.index.data[0].length === 0 &&
+    df.columns.length === 0
+  )
 }

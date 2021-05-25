@@ -18,10 +18,12 @@
 import Protobuf, {
   Arrow as ArrowProto,
   ArrowNamedDataSet,
+  BetaVegaLiteChart as BetaVegaLiteChartProto,
   Block as BlockProto,
   Delta,
   Element,
   ForwardMsgMetadata,
+  IArrowNamedDataSet,
   NamedDataSet,
 } from "src/autogen/proto"
 import { Map as ImmutableMap } from "immutable"
@@ -30,6 +32,7 @@ import { addRows } from "./dataFrameProto"
 import { toImmutableProto } from "./immutableProto"
 import { MetricsManager } from "./MetricsManager"
 import { makeElementWithInfoText, notUndefined } from "./utils"
+import { parseTable } from "./arrowProto"
 
 const NO_REPORT_ID = "NO_REPORT_ID"
 
@@ -129,7 +132,7 @@ export class ElementNode implements ReportNode {
    */
   private lazyImmutableElement: ImmutableMap<string, any> | undefined
 
-  private lazyQuiverElement: Quiver | undefined
+  private lazyQuiverElement: any | undefined
 
   /** Create a new ElementNode. */
   public constructor(
@@ -152,14 +155,50 @@ export class ElementNode implements ReportNode {
     return toReturn
   }
 
-  public get quiverElement(): any {
+  // (HK) TODO: Refactor.
+  public get quiverElement(): Quiver | BetaVegaLiteChartProto | undefined {
     if (this.lazyQuiverElement !== undefined) {
       return this.lazyQuiverElement
     }
 
-    const toReturn = new Quiver(this.element.betaTable as ArrowProto)
-    this.lazyQuiverElement = toReturn
-    return toReturn
+    const elementType = Object.keys(this.element)[0]
+
+    const getOneOf = {
+      betaVegaLiteChart: () => {
+        const proto = this.element.betaVegaLiteChart as BetaVegaLiteChartProto
+        const modifiedData = proto.data
+          ? new Quiver(parseTable(proto.data))
+          : null
+        const modifiedDatasets = proto.datasets.length
+          ? modifyDatasets(proto.datasets)
+          : []
+
+        return {
+          data: modifiedData,
+          spec: proto.spec,
+          datasets: modifiedDatasets,
+          useContainerWidth: proto.useContainerWidth,
+        }
+      },
+      betaTable: (): Quiver => {
+        const proto = this.element.betaTable as ArrowProto
+        const df = parseTable(proto)
+        return new Quiver(df)
+      },
+      betaDataFrame: (): Quiver => {
+        const proto = this.element.betaDataFrame as ArrowProto
+        const df = parseTable(proto)
+        return new Quiver(df)
+      },
+    }
+
+    if (elementType) {
+      // @ts-ignore
+      const toReturn = getOneOf[elementType]()
+      this.lazyQuiverElement = toReturn
+      return toReturn
+    }
+    return undefined
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -202,7 +241,8 @@ export class ElementNode implements ReportNode {
     reportId: string
   ): ElementNode {
     const newNode = new ElementNode(this.element, this.metadata, reportId)
-    newNode.lazyQuiverElement = betaAddRows(this.element, namedDataSet)
+    // @ts-ignore
+    newNode.lazyQuiverElement = betaAddRows(this.quiverElement, namedDataSet)
     return newNode
   }
 }
@@ -517,4 +557,16 @@ function getRootContainerName(deltaPath: number[]): string {
   }
 
   throw new Error(`Unrecognized RootContainer in deltaPath: ${deltaPath}`)
+}
+
+// (HK) TODO: Cleanup.
+function modifyDatasets(datasets: IArrowNamedDataSet[]): ArrowNamedDataSet[] {
+  return datasets.reduce((modifiedDatasets: any, dataset) => {
+    modifiedDatasets.push({
+      data: new Quiver(parseTable(dataset.data)),
+      hasName: dataset.hasName,
+      name: dataset.name,
+    })
+    return modifiedDatasets
+  }, [])
 }

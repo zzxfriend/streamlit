@@ -18,6 +18,7 @@
 import {
   Alert as AlertProto,
   Audio as AudioProto,
+  BetaVegaLiteChart as BetaVegaLiteChartProto,
   BokehChart as BokehChartProto,
   Button as ButtonProto,
   Checkbox as CheckboxProto,
@@ -100,6 +101,9 @@ const DebouncedBokehChart = debounceRender(BokehChart, 100)
 const DataFrame = React.lazy(() =>
   import("src/components/elements/DataFrame/")
 )
+const BetaDataFrame = React.lazy(() =>
+  import("src/components/elements/BetaDataFrame/")
+)
 const DeckGlJsonChart = React.lazy(() =>
   import("src/components/elements/DeckGlJsonChart/")
 )
@@ -115,6 +119,9 @@ const PlotlyChart = React.lazy(() =>
 )
 const VegaLiteChart = React.lazy(() =>
   import("src/components/elements/VegaLiteChart/")
+)
+const BetaVegaLiteChart = React.lazy(() =>
+  import("src/components/elements/BetaVegaLiteChart/")
 )
 const Video = React.lazy(() => import("src/components/elements/Video/"))
 
@@ -348,6 +355,16 @@ class Block extends PureComponent<Props> {
       case "balloons":
         return <Balloons reportId={this.props.reportId} />
 
+      case "betaDataFrame":
+        return (
+          <BetaDataFrame
+            reportId={this.props.reportId}
+            element={node.quiverElement as Quiver}
+            width={width}
+            height={height}
+          />
+        )
+
       case "betaTable":
         return <BetaTable element={node.quiverElement as Quiver} />
 
@@ -458,6 +475,14 @@ class Block extends PureComponent<Props> {
         return (
           <VegaLiteChart
             element={node.immutableElement.get("vegaLiteChart")}
+            width={width}
+          />
+        )
+
+      case "betaVegaLiteChart":
+        return (
+          <BetaVegaLiteChart
+            element={node.quiverElement as BetaVegaLiteChartProto}
             width={width}
           />
         )

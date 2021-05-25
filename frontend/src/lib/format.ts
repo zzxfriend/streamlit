@@ -90,10 +90,30 @@ function toFormattedString(x: any): string {
 }
 
 /**
+ * Formats the string nicely if it's a floating point, number, date or duration.
+ */
+function betaToFormattedString(x: any, type?: string): string {
+  if (moment.isMoment(x)) {
+    return x.format()
+  }
+  if (type === "float64") {
+    return numbro(x).format("0,0.0000")
+  }
+  if (type === "datetime") {
+    return moment(parseInt(x, 10)).format()
+  }
+  if (type === "empty") {
+    return "nan"
+  }
+
+  return x.toString()
+}
+
+/**
  * Returns true if this number is a float.
  */
 function isFloat(n: any): boolean {
   return Number(n) === n && n % 1 !== 0
 }
 
-export { Duration, Format, toFormattedString }
+export { Duration, Format, toFormattedString, betaToFormattedString }

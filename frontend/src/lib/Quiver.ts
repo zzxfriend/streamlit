@@ -15,9 +15,15 @@
  * limitations under the License.
  */
 
-import { ArrowNamedDataSet, Element, IArrow } from "src/autogen/proto"
-import { Table } from "apache-arrow"
-import { concatTables, Styler, toHumanFormat } from "src/lib/arrowProto"
+import { ArrowNamedDataSet } from "src/autogen/proto"
+import {
+  concatTables,
+  Styler,
+  parseTable,
+  DataFrame,
+  compareValues,
+} from "src/lib/arrowProto"
+import { betaToFormattedString } from "src/lib/format"
 
 interface TableDimensions {
   headerRows: number
@@ -28,7 +34,7 @@ interface TableDimensions {
   columns: number
 }
 
-type TableCellType = "blank" | "index" | "columns" | "data"
+export type TableCellType = "blank" | "index" | "columns" | "data"
 
 interface TableCell {
   type: TableCellType
@@ -38,31 +44,38 @@ interface TableCell {
 }
 
 export interface Index {
-  data: any[][]
-  type: IndexType
+  data: string[][]
+  type: IndexType[]
 }
 
 export interface IndexType {
-  name: any
+  name: string
   meta: any
+}
+
+export type Columns = string[][]
+
+export interface Data {
+  data: any[][]
+  type: string[]
 }
 
 export class Quiver {
   public index: Index
 
-  public columns: any[][]
+  public columns: Columns
 
-  public data: any[][]
+  public data: Data
 
-  private styler?: Styler
+  public styler?: Styler
 
-  constructor(element?: IArrow | null) {
-    const table = Table.from(element?.data)
-    const { index, columns, data } = toHumanFormat(table)
+  constructor(df: DataFrame) {
+    const { index, columns, data, styler } = df
 
     this.index = index
     this.columns = columns
     this.data = data
+    this.styler = styler
   }
 
   get tableId(): string | undefined {
@@ -84,20 +97,19 @@ export class Quiver {
 
     const [headerRows, dataColumnsCheck] = this.columns.length
       ? [this.columns.length, this.columns[0].length]
-      : [0, 0]
+      : [1, 0]
 
-    const [dataRows, dataColumns] = this.data.length
-      ? [this.data.length, this.data[0].length]
+    const [dataRows, dataColumns] = this.data.data.length
+      ? [this.data.data.length, this.data.data[0].length]
       : // If there is no data, default to the number of header columns.
         [0, dataColumnsCheck]
 
-    // (HK) TODO: dataRowsCheck isn't properly calculated after addRows.
     if (
       (dataRows !== 0 && dataRows !== dataRowsCheck) ||
       (dataColumns !== 0 && dataColumns !== dataColumnsCheck)
     ) {
       throw new Error(
-        "Table dimensions don't align: " +
+        "Dataframe dimensions don't align: " +
           `rows(${dataRows} != ${dataRowsCheck}) OR ` +
           `cols(${dataColumns} != ${dataColumnsCheck})`
       )
@@ -151,6 +163,7 @@ export class Quiver {
         `level${columnIndex}`,
         `row${dataRowIndex}`,
       ]
+      const contentType = this.index.type[columnIndex].name
 
       return {
         type: "index",
@@ -159,7 +172,10 @@ export class Quiver {
           : undefined,
         classNames: classNames.join(" "),
         // Table index is stored as is (in the column format).
-        content: this.index.data[columnIndex][dataRowIndex],
+        content: betaToFormattedString(
+          this.index.data[columnIndex][dataRowIndex],
+          contentType
+        ),
       }
     }
 
@@ -184,10 +200,13 @@ export class Quiver {
 
     const uuid = this.styler?.uuid
     const classNames = ["data", `row${dataRowIndex}`, `col${dataColumnIndex}`]
-
+    const contentType = this.data.type[dataColumnIndex]
     const content = this.styler?.displayValues
       ? this.styler.displayValues.getCell(rowIndex, columnIndex).content
-      : this.data[dataRowIndex][dataColumnIndex]
+      : betaToFormattedString(
+          this.data.data[dataRowIndex][dataColumnIndex],
+          contentType
+        )
 
     return {
       type: "data",
@@ -199,19 +218,153 @@ export class Quiver {
     }
   }
 
+  public getSortedDataRowIndices(
+    sortColumnIdx: number,
+    sortAscending: boolean
+  ): any[] {
+    const [dataRows, dataColumns] = this.tableRowsAndColumns
+    if (sortColumnIdx < 0 || sortColumnIdx >= dataColumns) {
+      throw new Error(
+        `Bad sortColumnIdx ${sortColumnIdx} (should be >= 0, < ${dataColumns})`
+      )
+    }
+
+    const sortColumnType = this.data.type[sortColumnIdx]
+
+    const indices = new Array(dataRows)
+    for (let i = 0; i < dataRows; i += 1) {
+      indices[i] = i
+    }
+    indices.sort((aRowIdx, bRowIdx) => {
+      const aValue = this.data.data[aRowIdx][sortColumnIdx]
+      const bValue = this.data.data[bRowIdx][sortColumnIdx]
+      return sortAscending
+        ? compareValues(aValue, bValue, sortColumnType)
+        : compareValues(bValue, aValue, sortColumnType)
+    })
+
+    return indices
+  }
+
+  public get tableRowsAndColumns(): number[] {
+    if (!this.data.data || !this.data.data[0]) {
+      return [0, 0]
+    }
+
+    const cols = this.data.data[0].length
+    if (cols === 0) {
+      return [0, 0]
+    }
+    const rows = this.data.data.length
+    return [rows, cols]
+  }
+
   public addRows(newRows: Quiver): void {
-    const { index, data } = concatTables(this, newRows)
+    const { index, data, columns, styler } = concatTables(this, newRows)
+
     this.index = index
     this.data = data
+    this.columns = columns
+    this.styler = styler
   }
 }
 
 export function betaAddRows(
-  element: Element,
+  element: any,
   namedDataSet: ArrowNamedDataSet
-): Quiver {
-  const original = new Quiver(element.betaTable)
-  const newRows = new Quiver(namedDataSet.data)
-  original.addRows(newRows)
-  return original
+): any {
+  const name = namedDataSet.hasName ? namedDataSet.name : null
+  const newRows = namedDataSet.data
+  const namedDataSets = getNamedDataSets(element)
+  const [existingDatasetIndex, existingDataSet] = getNamedDataSet(
+    namedDataSets,
+    name
+  )
+
+  let dataframeToModify
+
+  // There are 5 cases to consider:
+  // 1. add_rows has a named dataset
+  //   a) element has a named dataset with that name -> use that one
+  //   b) element has no named dataset with that name -> put the new dataset into the element
+  // 2. add_rows as an unnamed dataset
+  //   a) element has an unnamed dataset -> use that one
+  //   b) element has only named datasets -> use the first named dataset
+  //   c) element has no dataset -> put the new dataset into the element
+  if (namedDataSet.hasName) {
+    if (existingDataSet) {
+      dataframeToModify = existingDataSet.data
+    } else {
+      return pushNamedDataSet(element, namedDataSet)
+    }
+  } else {
+    const existingDataFrame =
+      element instanceof Quiver ? element : element.data
+    if (existingDataFrame) {
+      dataframeToModify = existingDataFrame
+    } else if (existingDataSet) {
+      dataframeToModify = existingDataSet.data
+    } else {
+      const newDf = parseTable(newRows)
+      const newQuiver = new Quiver(newDf)
+      element.addRows(newQuiver)
+
+      return element
+    }
+  }
+
+  const newDf = parseTable(newRows)
+  const newQuiver = new Quiver(newDf)
+
+  dataframeToModify.addRows(newQuiver)
+
+  if (existingDataSet) {
+    return setDataFrameInNamedDataSet(
+      element,
+      existingDatasetIndex,
+      dataframeToModify
+    )
+  }
+
+  return dataframeToModify
+}
+
+function setDataFrameInNamedDataSet(element: any, index: any, df: any): any {
+  return {
+    ...element,
+    datasets: [
+      {
+        ...element.datasets[index],
+        data: df,
+      },
+    ],
+  }
+}
+
+function getNamedDataSets(element: any): any {
+  return element?.datasets ? element.datasets : null
+}
+
+function getNamedDataSet(namedDataSets: any, name: any): any {
+  if (namedDataSets != null) {
+    if (namedDataSets.length === 1) {
+      const firstNamedDataSet = namedDataSets[0]
+      return [0, firstNamedDataSet]
+    }
+
+    const namedDataSetEntry = namedDataSets.find(
+      (ds: any) => ds.hasName && ds.name === name
+    )
+
+    if (namedDataSetEntry) {
+      return namedDataSetEntry
+    }
+  }
+
+  return [-1, null]
+}
+
+function pushNamedDataSet(element: any, namedDataset: any): any {
+  element.datasets.push(namedDataset)
+  return element
 }
