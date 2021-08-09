@@ -15,5 +15,17 @@
  * limitations under the License.
  */
 
-export { default, Placement } from "./Tooltip"
-export { default as OverflowTooltip } from "./OverflowTooltip"
+import styled from "@emotion/styled"
+
+export const StyledWrapper = styled.div({
+  display: "table",
+  tableLayout: "fixed",
+  width: "100%",
+})
+
+export const StyledEllipsizedDiv = styled.div({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+  display: "table-cell",
+})

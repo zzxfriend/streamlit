@@ -18,6 +18,8 @@
 import React, { ComponentType, ReactElement } from "react"
 import { ChevronTop, ChevronBottom } from "@emotion-icons/open-iconic"
 import Icon from "src/components/shared/Icon"
+import { OverflowTooltip, Placement } from "src/components/shared/Tooltip"
+import { StyledTooltipContentWrapper } from "src/components/shared/TooltipIcon"
 import { SortDirection } from "./SortDirection"
 import { StyledSortIcon } from "./styled-components"
 
@@ -85,7 +87,7 @@ export default function DataFrameCell({
   let onClick
   let role
   let tabIndex
-  let title = contents
+  let title
 
   const isDescending = columnSortDirection === SortDirection.DESCENDING
 
@@ -105,6 +107,11 @@ export default function DataFrameCell({
   const sortIcon =
     rowIndex === 0 ? drawSortIcon(columnSortDirection) : undefined
 
+  const tooltipContents =
+    rowIndex === 0 ? null : (
+      <StyledTooltipContentWrapper>{contents}</StyledTooltipContentWrapper>
+    )
+
   return (
     // (ESLint erroneously believes we're not assigning a role to our clickable div)
     // eslint-disable-next-line
@@ -120,7 +127,9 @@ export default function DataFrameCell({
       title={title}
       data-testid={CellType.displayName}
     >
-      {contents}
+      <OverflowTooltip content={tooltipContents} placement={Placement.AUTO}>
+        {contents}
+      </OverflowTooltip>
       {sortedByUser ? sortIcon : ""}
     </CellType>
   )
