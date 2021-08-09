@@ -43,7 +43,7 @@ describe("DataFrameCell Element", () => {
     const wrapper = shallow(<DataFrameCell {...props} />)
 
     expect(wrapper.find(StyledDataFrameCornerCell).length).toBe(1)
-    expect(wrapper.prop("children")).toStrictEqual(["", ""])
+    expect(wrapper.find("OverflowTooltip").props().content).toStrictEqual(null)
   })
 
   describe("render a sortIcon if it's sorted by the user", () => {
