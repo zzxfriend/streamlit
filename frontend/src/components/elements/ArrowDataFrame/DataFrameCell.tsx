@@ -48,6 +48,9 @@ export interface DataFrameCellProps {
   /** The cell's CSS class */
   className: string
 
+  /** True if this cell holds a number */
+  isNumeric: boolean
+
   /**
    * If true, then the table's sorting was manually set by the user, by
    * clicking on a column header. We only show the sort arrow when this is
@@ -81,6 +84,7 @@ export default function DataFrameCell({
   style,
   columnSortDirection,
   className,
+  isNumeric,
   id,
   headerClickedCallback,
 }: DataFrameCellProps): ReactElement {
@@ -127,7 +131,13 @@ export default function DataFrameCell({
       title={title}
       data-testid={CellType.displayName}
     >
-      <OverflowTooltip content={tooltipContents} placement={Placement.AUTO}>
+      <OverflowTooltip
+        content={tooltipContents}
+        placement={Placement.AUTO}
+        style={{
+          textAlign: isNumeric ? "right" : undefined,
+        }}
+      >
         {contents}
       </OverflowTooltip>
       {sortedByUser ? sortIcon : ""}
