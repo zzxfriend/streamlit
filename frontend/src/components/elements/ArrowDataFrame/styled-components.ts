@@ -56,10 +56,10 @@ export const StyledDataFrameContainer = styled.div<
 }))
 
 const StyledDataFrameCell = styled.div(({ theme }) => ({
-  padding: theme.spacing.sm,
+  padding: `${theme.spacing.twoXS} ${theme.spacing.xs}`,
   borderBottom: `1px solid ${theme.colors.fadedText10}`,
   borderRight: `1px solid ${theme.colors.fadedText10}`,
-  fontSize: theme.fontSizes.md,
+  fontSize: theme.fontSizes.sm,
   fontFamily: theme.fonts.sansSerif,
   lineHeight: theme.lineHeights.table,
   display: "flex",
