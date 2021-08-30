@@ -84,6 +84,32 @@ export const StyledSidebarContent = styled.div<StyledSidebarContentProps>(
       zIndex: theme.zIndices.sidebarMobile,
     },
 
+    "& h1": {
+      fontSize: theme.fontSizes.xl,
+      fontWeight: 600,
+    },
+
+    "& h2": {
+      fontSize: theme.fontSizes.lg,
+      fontWeight: 600,
+    },
+
+    "& h3": {
+      fontSize: "1.125rem",
+      fontWeight: 600,
+    },
+
+    "& h4": {
+      fontSize: theme.fontSizes.md,
+      fontWeight: 600,
+    },
+
+    "& h5,h6": {
+      fontSize: theme.fontSizes.smDefault,
+      fontWeight: 600,
+      textTransform: "uppercase",
+    },
+
     small: {
       color: theme.colors.gray,
       fontSize: theme.fontSizes.sm,

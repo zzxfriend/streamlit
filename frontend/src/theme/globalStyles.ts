@@ -142,7 +142,7 @@ export const globalStyles = (theme: Theme): any => css`
 
   h1 {
     font-family: ${theme.genericFonts.headingFont};
-    font-weight: ${theme.fontWeights.bold};
+    font-weight: ${theme.fontWeights.extrabold};
     color: ${theme.colors.headingColor};
 
     // Use rem so we can remove it when first child, knowing that the
@@ -157,7 +157,7 @@ export const globalStyles = (theme: Theme): any => css`
 
   h2 {
     font-family: ${theme.genericFonts.headingFont};
-    font-weight: ${theme.fontWeights.bold};
+    font-weight: ${theme.fontWeights.extrabold};
     color: ${theme.colors.headingColor};
     // Use rem so we can remove it when first child, knowing that the
     // element-container above always adds 1rem.
