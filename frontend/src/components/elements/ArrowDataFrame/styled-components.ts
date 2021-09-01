@@ -29,15 +29,21 @@ export const StyledDataFrameContainer = styled.div<
   border: `1px solid ${theme.colors.fadedText10}`,
   boxSizing: "content-box",
 
+  // The top header should never show a scrollbar.
+  // To scroll, move mouse to the main content area.
   "& .table-top-right": {
     overflow: "hidden !important",
   },
 
+  // The left header should never show a scrollbar.
+  // To scroll, move mouse to the main content area.
   "& .table-bottom-left": {
     overflow: "hidden !important",
     paddingBottom: "6px",
   },
 
+  // Only this area should ever show a scrollbar
+  // However, only show on hover.
   "& .table-bottom-right": {
     overflow: "hidden !important",
 
