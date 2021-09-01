@@ -101,7 +101,7 @@ export const StyledCopyButton = styled.button(({ theme }) => ({
   height: "2.5rem",
   padding: 0,
   width: "2.5rem",
-  transition: "opacity 300ms 100ms, transform 300ms 100ms",
+  transition: "opacity 300ms 150ms, transform 300ms 150ms",
   border: "none",
   backgroundColor: theme.colors.transparent,
   color: theme.colors.fadedText60,
