@@ -25,6 +25,7 @@ import { logWarning } from "src/lib/log"
 import { scrollbarSize } from "src/vendor/dom-helpers"
 import React, { ReactElement, ComponentType } from "react"
 import { Map as ImmutableMap } from "immutable"
+import { fontSizes } from "src/theme/primitives/typography"
 import {
   StyledDataFrameRowHeaderCell,
   StyledDataFrameDataCell,
@@ -40,7 +41,7 @@ const SORT_ICON_WIDTH_PX = 10
 /**
  * Height of dataframe row.
  */
-export const ROW_HEIGHT = 35
+export const ROW_HEIGHT = fontSizes.smPx * 2
 
 /**
  * Minimum size of a dataframe cell.
