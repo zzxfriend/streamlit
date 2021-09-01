@@ -47,7 +47,7 @@ export const StyledFullScreenButton = styled.button<
     zIndex: theme.zIndices.sidebar + 1,
     height: "2.5rem",
     width: "2.5rem",
-    transition: "opacity 300ms 100ms, transform 300ms 100ms",
+    transition: "opacity 300ms 150ms, transform 300ms 150ms",
     border: "none",
     color: theme.colors.fadedText60,
     borderRadius: "50%",
