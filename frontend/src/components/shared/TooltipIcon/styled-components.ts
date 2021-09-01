@@ -21,10 +21,7 @@ export const StyledTooltipContentWrapper = styled.div(({ theme }) => ({
   maxWidth: `calc(${theme.sizes.contentMaxWidth} - 4rem)`,
   maxHeight: "300px",
   overflow: "auto",
-  paddingTop: theme.spacing.sm,
-  paddingBottom: theme.spacing.sm,
-  paddingRight: theme.spacing.lg,
-  paddingLeft: theme.spacing.lg,
+  padding: `${theme.spacing.xs} ${theme.spacing.md}`,
 
   [`@media (max-width: ${theme.breakpoints.sm})`]: {
     maxWidth: `calc(100% - 2rem)`,
