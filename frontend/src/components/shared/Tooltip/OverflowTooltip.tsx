@@ -25,6 +25,7 @@ export interface OverflowTooltipProps {
   placement: Placement
   children: ReactNode
   inline?: boolean
+  style: React.CSSProperties
 }
 
 /**
@@ -36,6 +37,7 @@ function OverflowTooltip({
   placement,
   children,
   inline,
+  style,
 }: OverflowTooltipProps): ReactElement {
   const childRef = React.useRef<HTMLDivElement>(null)
   const [allowTooltip, setAllowTooltip] = useState(false)
@@ -56,7 +58,9 @@ function OverflowTooltip({
       inline={inline}
     >
       <StyledWrapper>
-        <StyledEllipsizedDiv ref={childRef}>{children}</StyledEllipsizedDiv>
+        <StyledEllipsizedDiv ref={childRef} style={style}>
+          {children}
+        </StyledEllipsizedDiv>
       </StyledWrapper>
     </Tooltip>
   )

@@ -132,7 +132,6 @@ export function ArrowDataFrame({
         ...baseStyle,
         borderBottom: isLastRow && hasData ? "none" : undefined,
         borderRight: isLastCol ? "none" : undefined,
-        justifyContent: isNumeric ? "flex-end" : undefined,
       }
 
       return (
@@ -144,6 +143,7 @@ export function ArrowDataFrame({
           columnIndex={columnIndex}
           rowIndex={rowIndex}
           style={style}
+          isNumeric={isNumeric}
           contents={contents}
           sortedByUser={sortedByUser}
           columnSortDirection={columnSortDirection}
