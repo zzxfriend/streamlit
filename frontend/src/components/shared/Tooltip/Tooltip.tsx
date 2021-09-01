@@ -41,6 +41,7 @@ export interface TooltipProps {
   placement: Placement
   children: ReactNode
   inline?: boolean
+  style?: React.CSSProperties
 }
 
 function Tooltip({
@@ -48,6 +49,7 @@ function Tooltip({
   placement,
   children,
   inline,
+  style,
 }: TooltipProps): ReactElement {
   const theme: Theme = useTheme()
   const { colors, fontSizes } = theme
@@ -62,7 +64,7 @@ function Tooltip({
       overrides={{
         Arrow: {
           style: {
-            backgroundColor: colors.secondaryBg,
+            backgroundColor: colors.bgColor,
             border: `1px solid ${colors.fadedText10}`,
           },
         },
@@ -88,7 +90,7 @@ function Tooltip({
         },
         Inner: {
           style: {
-            backgroundColor: colors.secondaryBg,
+            backgroundColor: colors.bgColor,
             color: colors.bodyText,
             fontSize: fontSizes.sm,
             fontWeight: "normal",
@@ -109,6 +111,7 @@ function Tooltip({
           display: "flex",
           flexDirection: "row",
           justifyContent: inline ? "flex-end" : "",
+          ...style,
         }}
         data-testid="tooltipHoverTarget"
       >

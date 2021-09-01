@@ -51,6 +51,7 @@ export const StyledConnectionStatusLabel = styled.label<
     "opacity 500ms 0ms, clip 500ms 0ms, max-width 500ms 0ms, margin 500ms 0ms, visibility 0ms 500ms",
   opacity: isMinimized ? 0 : 1,
   visibility: isMinimized ? "hidden" : "visible",
+  lineHeight: 1,
 }))
 
 /*
@@ -157,4 +158,12 @@ export const StyledShortcutLabel = styled.div(({ theme }) => ({
   "&::first-letter": {
     textDecoration: "underline",
   },
+}))
+
+export const StyledTooltipContentWrapper = styled.div(({ theme }) => ({
+  paddingTop: theme.spacing.sm,
+  paddingBottom: theme.spacing.sm,
+  paddingRight: theme.spacing.lg,
+  paddingLeft: theme.spacing.lg,
+  fontSize: theme.fontSizes.sm,
 }))
