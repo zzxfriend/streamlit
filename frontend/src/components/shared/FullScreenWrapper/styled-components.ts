@@ -40,7 +40,10 @@ export const StyledFullScreenButton = styled.button<
 
   return {
     position: "absolute",
-    padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
     zIndex: theme.zIndices.sidebar + 1,
     height: "2.5rem",
     width: "2.5rem",
