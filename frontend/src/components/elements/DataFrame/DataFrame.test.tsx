@@ -140,7 +140,7 @@ describe("DataFrame Element", () => {
     wrapper = shallow(<DataFrame {...props} />)
     const widthWithScrollbar = wrapper.find("MultiGrid").props().width
 
-    expect(widthWithScrollbar).toBe(normalWidth)
+    expect(widthWithScrollbar).toBe(normalWidth + SCROLLBAR_SIZE)
   })
 
   it("should render numeric column with text-align set to right", () => {

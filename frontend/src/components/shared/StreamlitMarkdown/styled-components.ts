@@ -113,7 +113,7 @@ export const StyledLinkIcon = styled.a(({ theme }) => ({
     stroke: theme.colors.fadedText60,
   },
 
-  ":hover svg": {
+  "&:hover svg": {
     stroke: theme.colors.bodyText,
   },
 }))
