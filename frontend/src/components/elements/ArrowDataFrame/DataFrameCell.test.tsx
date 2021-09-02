@@ -16,11 +16,10 @@
  */
 
 import React from "react"
-import { shallow, mount } from "enzyme"
+import { shallow } from "enzyme"
 import { ChevronTop, ChevronBottom } from "@emotion-icons/open-iconic"
-import ThemeProvider from "src/components/core/ThemeProvider"
-import { lightTheme, lightBaseUITheme } from "src/theme"
 import Tooltip from "src/components/shared/Tooltip"
+import { mount } from "src/lib/test_util"
 
 import { SortDirection } from "./SortDirection"
 import { StyledDataFrameCornerCell } from "./styled-components"
@@ -37,17 +36,14 @@ const getProps = (
   sortedByUser: false,
   columnSortDirection: SortDirection.ASCENDING,
   style: {},
+  isNumeric: false,
   ...props,
 })
 
 describe("DataFrameCell Element", () => {
   it("renders without crashing", () => {
     const props = getProps()
-    const wrapper = mount(
-      <ThemeProvider theme={lightTheme.emotion} baseuiTheme={lightBaseUITheme}>
-        <DataFrameCell {...props} />
-      </ThemeProvider>
-    )
+    const wrapper = mount(<DataFrameCell {...props} />)
 
     expect(wrapper.find(StyledDataFrameCornerCell).length).toBe(1)
 
@@ -56,19 +52,36 @@ describe("DataFrameCell Element", () => {
     expect(tooltipContents).toStrictEqual("")
   })
 
+  describe("the alignment of the contents", () => {
+    it("should be to the right when numeric", () => {
+      const props = getProps({
+        isNumeric: true,
+      })
+      const wrapper = mount(<DataFrameCell {...props} />)
+
+      expect(wrapper.find("StyledEllipsizedDiv").props().style.textAlign).toBe(
+        "right"
+      )
+    })
+
+    it("should be to the left when non-numeric", () => {
+      const props = getProps({
+        isNumeric: false,
+      })
+      const wrapper = mount(<DataFrameCell {...props} />)
+
+      expect(wrapper.find("StyledEllipsizedDiv").props().style.textAlign).toBe(
+        undefined
+      )
+    })
+  })
+
   describe("render a sortIcon if it's sorted by the user", () => {
     it("should render ascending icon", () => {
       const props = getProps({
         sortedByUser: true,
       })
-      const wrapper = mount(
-        <ThemeProvider
-          theme={lightTheme.emotion}
-          baseuiTheme={lightBaseUITheme}
-        >
-          <DataFrameCell {...props} />
-        </ThemeProvider>
-      )
+      const wrapper = mount(<DataFrameCell {...props} />)
 
       expect(wrapper.find("Icon").prop("content")).toBe(ChevronTop)
     })
@@ -78,14 +91,7 @@ describe("DataFrameCell Element", () => {
         sortedByUser: true,
         columnSortDirection: SortDirection.DESCENDING,
       })
-      const wrapper = mount(
-        <ThemeProvider
-          theme={lightTheme.emotion}
-          baseuiTheme={lightBaseUITheme}
-        >
-          <DataFrameCell {...props} />
-        </ThemeProvider>
-      )
+      const wrapper = mount(<DataFrameCell {...props} />)
 
       expect(wrapper.find("Icon").prop("content")).toBe(ChevronBottom)
     })
@@ -130,14 +136,7 @@ describe("DataFrameCell Element", () => {
       const props = getProps({
         headerClickedCallback: jest.fn().mockReturnValue(1),
       })
-      const wrapper = mount(
-        <ThemeProvider
-          theme={lightTheme.emotion}
-          baseuiTheme={lightBaseUITheme}
-        >
-          <DataFrameCell {...props} />
-        </ThemeProvider>
-      )
+      const wrapper = mount(<DataFrameCell {...props} />)
 
       const tooltipContents = wrapper.find(Tooltip).prop("content").props
         .children
@@ -149,14 +148,7 @@ describe("DataFrameCell Element", () => {
         headerClickedCallback: jest.fn().mockReturnValue(1),
         columnSortDirection: SortDirection.DESCENDING,
       })
-      const wrapper = mount(
-        <ThemeProvider
-          theme={lightTheme.emotion}
-          baseuiTheme={lightBaseUITheme}
-        >
-          <DataFrameCell {...props} />
-        </ThemeProvider>
-      )
+      const wrapper = mount(<DataFrameCell {...props} />)
 
       const tooltipContents = wrapper.find(Tooltip).prop("content").props
         .children
@@ -169,14 +161,7 @@ describe("DataFrameCell Element", () => {
         columnSortDirection: undefined,
         contents: "contenido",
       })
-      const wrapper = mount(
-        <ThemeProvider
-          theme={lightTheme.emotion}
-          baseuiTheme={lightBaseUITheme}
-        >
-          <DataFrameCell {...props} />
-        </ThemeProvider>
-      )
+      const wrapper = mount(<DataFrameCell {...props} />)
 
       const tooltipContents = wrapper.find(Tooltip).prop("content").props
         .children
