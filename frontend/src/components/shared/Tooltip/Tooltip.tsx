@@ -59,7 +59,9 @@ function Tooltip({
   return (
     <StatefulTooltip
       content={
-        <StyledTooltipContentWrapper>{content}</StyledTooltipContentWrapper>
+        content ? (
+          <StyledTooltipContentWrapper>{content}</StyledTooltipContentWrapper>
+        ) : null
       }
       placement={PLACEMENT[placement]}
       accessibilityType={ACCESSIBILITY_TYPE.tooltip}
