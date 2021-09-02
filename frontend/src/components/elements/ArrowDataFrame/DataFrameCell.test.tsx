@@ -36,6 +36,7 @@ const getProps = (
   sortedByUser: false,
   columnSortDirection: SortDirection.ASCENDING,
   style: {},
+  isNumeric: false,
   ...props,
 })
 
@@ -49,6 +50,30 @@ describe("DataFrameCell Element", () => {
     const tooltipContents = wrapper.find(Tooltip).prop("content").props
       .children
     expect(tooltipContents).toStrictEqual("")
+  })
+
+  describe("the alignment of the contents", () => {
+    it("should be to the right when numeric", () => {
+      const props = getProps({
+        isNumeric: true,
+      })
+      const wrapper = mount(<DataFrameCell {...props} />)
+
+      expect(wrapper.find("StyledEllipsizedDiv").props().style.textAlign).toBe(
+        "right"
+      )
+    })
+
+    it("should be to the left when non-numeric", () => {
+      const props = getProps({
+        isNumeric: false,
+      })
+      const wrapper = mount(<DataFrameCell {...props} />)
+
+      expect(wrapper.find("StyledEllipsizedDiv").props().style.textAlign).toBe(
+        undefined
+      )
+    })
   })
 
   describe("render a sortIcon if it's sorted by the user", () => {
