@@ -136,6 +136,6 @@ describe("DataFrame Element", () => {
     const widthWithScrollbar = wrapper.find("MultiGrid").props()
       .width as number
 
-    expect(widthWithScrollbar).toBe(normalWidth)
+    expect(widthWithScrollbar).toBe(normalWidth + SCROLLBAR_SIZE)
   })
 })
