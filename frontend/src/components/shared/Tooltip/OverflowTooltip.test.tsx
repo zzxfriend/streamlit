@@ -40,6 +40,8 @@ describe("Tooltip component", () => {
       <OverflowTooltip content="the content">the child</OverflowTooltip>
     )
 
+    expect(wrapper.props().content).toBe("")
+
     expect(useRefSpy).toBeCalledWith(null)
     expect(wrapper).toMatchSnapshot()
   })
@@ -58,6 +60,8 @@ describe("Tooltip component", () => {
     const wrapper = shallow(
       <OverflowTooltip content="the content">the child</OverflowTooltip>
     )
+
+    expect(wrapper.props().content).toBe("the content")
 
     expect(useRefSpy).toBeCalledWith(null)
     expect(wrapper).toMatchSnapshot()

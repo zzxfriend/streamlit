@@ -29,17 +29,9 @@ export const StyledDataFrameContainer = styled.div<
   border: `1px solid ${theme.colors.fadedText10}`,
   boxSizing: "content-box",
 
-  // The top header should never show a scrollbar.
-  // To scroll, move mouse to the main content area.
-  "& .table-top-right": {
-    overflow: "hidden !important",
-  },
-
-  // The left header should never show a scrollbar.
-  // To scroll, move mouse to the main content area.
+  // Make sure when we scroll up the left side has a little extra padding to acccount for scrollbar.
   "& .table-bottom-left": {
-    overflow: "hidden !important",
-    paddingBottom: "6px",
+    paddingBottom: "6px" /* Scrollbar size */,
   },
 
   // Only this area should ever show a scrollbar
@@ -52,10 +44,10 @@ export const StyledDataFrameContainer = styled.div<
     },
   },
 
+  // Remove visible outline from click, since there's no click target/action anyway.
   "& .table-bottom-right:focus-visible": {
     outline: "none",
   },
-
   "& .table-bottom-right:focus": {
     outline: "none",
   },
