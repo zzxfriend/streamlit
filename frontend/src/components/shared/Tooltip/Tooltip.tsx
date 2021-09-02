@@ -20,6 +20,8 @@ import { useTheme } from "emotion-theming"
 import { Theme } from "src/theme"
 import { StatefulTooltip, ACCESSIBILITY_TYPE, PLACEMENT } from "baseui/tooltip"
 
+import { StyledTooltipContentWrapper } from "./styled-components"
+
 export enum Placement {
   AUTO = "auto",
   TOP_LEFT = "topLeft",
@@ -56,7 +58,9 @@ function Tooltip({
 
   return (
     <StatefulTooltip
-      content={content}
+      content={
+        <StyledTooltipContentWrapper>{content}</StyledTooltipContentWrapper>
+      }
       placement={PLACEMENT[placement]}
       accessibilityType={ACCESSIBILITY_TYPE.tooltip}
       showArrow
