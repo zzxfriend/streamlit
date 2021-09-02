@@ -309,8 +309,8 @@ export function ArrowDataFrame({
         fixedRowCount={headerRows}
         columnWidth={columnWidth}
         columnCount={columns}
-        enableFixedColumnScroll
-        enableFixedRowScroll
+        enableFixedColumnScroll={false}
+        enableFixedRowScroll={false}
         height={height}
         rowHeight={rowHeight}
         rowCount={rows}
