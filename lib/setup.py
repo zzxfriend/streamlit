@@ -72,6 +72,7 @@ setuptools.setup(
     python_requires=">=3.6",
     license="Apache 2",
     packages=setuptools.find_packages(exclude=["tests", "tests.*"]),
+    package_data={"streamlit": ["pages/index.py", "pages/not_found.py"]},
     # Requirements
     install_requires=requirements,
     zip_safe=False,  # install source files not egg
