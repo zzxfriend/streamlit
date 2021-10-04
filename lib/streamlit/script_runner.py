@@ -284,14 +284,17 @@ class ScriptRunner(object):
                 module_root_path = os.path.dirname(os.path.realpath(__file__))
                 if not rerun_data.script_path:
                     script_path = os.path.join(module_root_path, "pages", "index.py")
-                elif not os.path.isfile(
-                    rerun_data.script_path
-                ) or not rerun_data.script_path.endswith("_app.py"):
-                    script_path = os.path.join(
-                        module_root_path, "pages", "not_found.py"
-                    )
                 else:
                     script_path = rerun_data.script_path
+                    if script_path[-1] == "/":  # remove optional trailing slash
+                        script_path = script_path[:-1]
+
+                    if not os.path.isfile(script_path) or not script_path.endswith(
+                        "_app.py"
+                    ):
+                        script_path = os.path.join(
+                            module_root_path, "pages", "not_found.py"
+                        )
             else:
                 script_path = self._report.script_path
 
