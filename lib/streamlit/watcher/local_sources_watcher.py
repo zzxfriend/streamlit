@@ -51,10 +51,20 @@ class LocalSourcesWatcher(object):
         # A dict of filepath -> WatchedModule.
         self._watched_modules = {}
 
-        self._register_watcher(
-            self._report.script_path,
-            module_name=None,  # Only the root script has None here.
-        )
+        if os.path.isdir(self._report.script_path):
+            from streamlit.server.server import Server
+
+            app_files = Server.get_current().get_app_files()
+            for filename in app_files:
+                self._register_watcher(
+                    f"{self._report.script_path}{filename[1:]}",
+                    module_name=None,
+                )
+        else:
+            self._register_watcher(
+                self._report.script_path,
+                module_name=None,  # Only the root script has None here.
+            )
 
     def on_file_changed(self, filepath):
         if filepath not in self._watched_modules:
