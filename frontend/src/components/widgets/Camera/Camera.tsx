@@ -21,6 +21,12 @@ import { CameraImageInput as CameraImageInputProto } from "src/autogen/proto"
 import { WidgetStateManager } from "src/lib/WidgetStateManager"
 import { ReportRunState } from "src/lib/ReportRunState"
 import { CameraState } from "src/lib/CameraState"
+import UIButton, {
+  ButtonTooltip,
+  Kind,
+  Size,
+} from "src/components/shared/Button"
+import Icon from "src/components/shared/Icon"
 
 export interface CameraProps {
   element: CameraImageInputProto
@@ -28,16 +34,10 @@ export interface CameraProps {
   reportRunState: ReportRunState
 }
 
-interface CameraState {
-  cameraState: CameraState
-}
-
 function Camera({ element, widgetMgr, reportRunState }: CameraProps) {
   const webcamRef = useRef<Webcam>(null) as any
   const [imgSrc, setImgSrc] = useState<string | null>(null)
-  const [cameraState, setCameraState] = useState<string | null>(
-    CameraState.PHOTO_TAKING
-  )
+  const [isTakingPhoto, setIsTakingPhoto] = useState<boolean>(true)
   // const isRunning = reportRunState === ReportRunState.RUNNING
   //   console.log(isRunning)
   console.log(element)
@@ -45,15 +45,37 @@ function Camera({ element, widgetMgr, reportRunState }: CameraProps) {
   const capture = React.useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot()
     widgetMgr.setStringValue(element, imageSrc, { fromUi: true })
-    setCameraState(CameraState.PHOTO_TAKEN)
+    setIsTakingPhoto(false)
     setImgSrc(imageSrc)
-  }, [webcamRef, setImgSrc])
+  }, [webcamRef, setImgSrc, isTakingPhoto])
+
+  const clear = React.useCallback(() => {
+    setImgSrc(null)
+    setIsTakingPhoto(true)
+  }, [setImgSrc, setIsTakingPhoto])
 
   return (
     <>
-      <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" />
-      <button onClick={capture}>Capture photo</button>
-      {imgSrc && <img src={imgSrc} />}
+      {isTakingPhoto && (
+        <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" />
+      )}
+      {isTakingPhoto && (
+        <ButtonTooltip help={element.help}>
+          <UIButton kind={Kind.PRIMARY} size={Size.SMALL} onClick={capture}>
+            {" "}
+            Capture
+          </UIButton>
+        </ButtonTooltip>
+      )}
+      {!isTakingPhoto && imgSrc && <img src={imgSrc} />}
+      {!isTakingPhoto && (
+        <ButtonTooltip help={element.help}>
+          <UIButton kind={Kind.PRIMARY} size={Size.SMALL} onClick={clear}>
+            {" "}
+            Clear
+          </UIButton>
+        </ButtonTooltip>
+      )}
     </>
   )
 }
