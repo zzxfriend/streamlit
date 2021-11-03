@@ -16,6 +16,6 @@
  */
 
 export enum CameraState {
-  PHOTO_TAKING = "PHOTO_TAKING"
-  PHOTO_TAKEN = "PHOTO_TAKEN"
+  PHOTO_TAKING = "PHOTO_TAKING",
+  PHOTO_TAKEN = "PHOTO_TAKEN",
 }
