@@ -72,9 +72,8 @@ setuptools.setup(
     python_requires=">=3.6",
     license="Apache 2",
     # PEP 561: https://mypy.readthedocs.io/en/stable/installed_packages.html
-    package_data={"streamlit": ["py.typed"]},
+    package_data={"streamlit": ["py.typed", "pages/index.py", "pages/not_found.py"]},
     packages=setuptools.find_packages(exclude=["tests", "tests.*"]),
-    package_data={"streamlit": ["pages/index.py", "pages/not_found.py"]},
     # Requirements
     install_requires=requirements,
     zip_safe=False,  # install source files not egg
