@@ -103,6 +103,7 @@ class ScriptRunner(object):
         self._client_state = client_state
         self._session_state: SessionState = session_state
         self._session_state.set_widgets_from_proto(client_state.widget_states)
+        self._script_path = ""
 
         self.on_event = Signal(
             doc="""Emitted when a ScriptRunnerEvent occurs.
@@ -183,6 +184,7 @@ class ScriptRunner(object):
         # created.
         client_state = ClientState()
         client_state.query_string = self._client_state.query_string
+        client_state.script_path = self._script_path
         widget_states = self._session_state.as_widget_states()
         client_state.widget_states.widgets.extend(widget_states)
         self.on_event.send(ScriptRunnerEvent.SHUTDOWN, client_state=client_state)
@@ -286,6 +288,7 @@ class ScriptRunner(object):
                     script_path = os.path.join(module_root_path, "pages", "index.py")
                 else:
                     script_path = rerun_data.script_path
+                    self._script_path = script_path
                     if script_path[-1] == "/":  # remove optional trailing slash
                         script_path = script_path[:-1]
 
