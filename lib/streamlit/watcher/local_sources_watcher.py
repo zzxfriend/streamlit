@@ -57,7 +57,7 @@ class LocalSourcesWatcher(object):
             app_files = Server.get_current().get_app_files()
             for filename in app_files:
                 self._register_watcher(
-                    f"{self._report.script_path}{filename[1:]}",
+                    os.path.join(os.getcwd(), filename),
                     module_name=None,
                 )
         else:

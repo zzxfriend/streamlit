@@ -25,6 +25,7 @@ import { ComponentRegistry } from "src/components/widgets/CustomComponent"
 import { sendS4AMessage } from "src/hocs/withS4ACommunication/withS4ACommunication"
 
 import PageLayoutContext from "src/components/core/PageLayoutContext"
+import { ConnectionManager } from "src/lib/ConnectionManager"
 import { BlockNode, ReportRoot } from "src/lib/ReportNode"
 
 import {
@@ -61,6 +62,8 @@ export interface ReportViewProps {
   componentRegistry: ComponentRegistry
 
   formsData: FormsData
+
+  connectionManager: ConnectionManager | null
 }
 
 /**
@@ -77,6 +80,7 @@ function ReportView(props: ReportViewProps): ReactElement {
     uploadClient,
     componentRegistry,
     formsData,
+    connectionManager,
   } = props
 
   React.useEffect(() => {
@@ -108,6 +112,7 @@ function ReportView(props: ReportViewProps): ReactElement {
         uploadClient={uploadClient}
         componentRegistry={componentRegistry}
         formsData={formsData}
+        connectionManager={connectionManager}
       />
     </StyledReportViewBlockContainer>
   )

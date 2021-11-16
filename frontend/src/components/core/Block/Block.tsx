@@ -54,6 +54,7 @@ import React, { PureComponent, ReactNode, Suspense } from "react"
 import { AutoSizer } from "react-virtualized"
 // @ts-ignore
 import debounceRender from "react-debounce-render"
+import { ConnectionManager } from "src/lib/ConnectionManager"
 import { ReportRunState } from "src/lib/ReportRunState"
 import { FormsData, WidgetStateManager } from "src/lib/WidgetStateManager"
 import { getElementWidgetID } from "src/lib/utils"
@@ -167,6 +168,7 @@ interface Props {
   widgetsDisabled: boolean
   componentRegistry: ComponentRegistry
   formsData: FormsData
+  connectionManager: ConnectionManager | null
 }
 
 class Block extends PureComponent<Props> {
@@ -235,6 +237,7 @@ class Block extends PureComponent<Props> {
         widgetsDisabled={this.props.widgetsDisabled}
         componentRegistry={this.props.componentRegistry}
         formsData={this.props.formsData}
+        connectionManager={this.props.connectionManager}
         {...optionalProps}
       />
     )
@@ -380,7 +383,11 @@ class Block extends PureComponent<Props> {
 
       case "audio":
         return (
-          <Audio width={width} element={node.element.audio as AudioProto} />
+          <Audio
+            width={width}
+            element={node.element.audio as AudioProto}
+            connectionManager={this.props.connectionManager}
+          />
         )
 
       case "balloons":
@@ -468,6 +475,7 @@ class Block extends PureComponent<Props> {
           <ImageList
             width={width}
             element={node.element.imgs as ImageListProto}
+            connectionManager={this.props.connectionManager}
           />
         )
 
@@ -520,7 +528,11 @@ class Block extends PureComponent<Props> {
 
       case "video":
         return (
-          <Video width={width} element={node.element.video as VideoProto} />
+          <Video
+            width={width}
+            element={node.element.video as VideoProto}
+            connectionManager={this.props.connectionManager}
+          />
         )
 
       // Widgets
@@ -552,6 +564,7 @@ class Block extends PureComponent<Props> {
             key={downloadButtonProto.id}
             element={downloadButtonProto}
             width={width}
+            connectionManager={this.props.connectionManager}
             {...widgetProps}
           />
         )
