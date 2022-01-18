@@ -256,12 +256,10 @@ class AppSession:
                 ),
                 None,
             )
-            script_path = page_desc['script_path']
+            script_path = page_desc["script_path"]
 
             if script_path:
-                LOGGER.debug(
-                    f"received rerun request for script at path {script_path}"
-                )
+                LOGGER.debug(f"received rerun request for script at path {script_path}")
 
             rerun_data = RerunData(
                 client_state.query_string,
