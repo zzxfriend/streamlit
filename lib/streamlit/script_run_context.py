@@ -44,8 +44,9 @@ class ScriptRunContext:
     query_string: str
     session_state: SessionState
     uploaded_file_mgr: UploadedFileManager
-    user_info: attr.Factory(dict)
+    page_name: str
 
+    user_info: attr.Factory(dict)
     _set_page_config_allowed: bool = True
     _has_script_started: bool = False
     widget_ids_this_run: Set[str] = attr.Factory(set)
