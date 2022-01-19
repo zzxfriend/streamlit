@@ -242,7 +242,7 @@ class AppSession:
 
         """
         if client_state:
-            page_name = (unquote(client_state.page_name).rstrip("/"),)
+            page_name = unquote(client_state.page_name).rstrip("/")
             pages_dir = os.path.join(self._session_data.script_folder, "pages")
             page_desc = next(
                 filter(
@@ -261,7 +261,7 @@ class AppSession:
                 client_state.query_string,
                 client_state.widget_states,
                 client_state.page_name,
-                page_desc["script_path"],
+                page_desc["script_path"] if page_desc else "",
             )
         else:
             rerun_data = RerunData()
