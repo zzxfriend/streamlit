@@ -154,7 +154,7 @@ class Sidebar extends PureComponent<SidebarProps, State> {
   public render = (): ReactElement => {
     const { collapsedSidebar } = this.state
     const { chevronDownshift, children } = this.props
-    const { pages, currentScript } = this.context
+    const { pages, currentPage } = this.context
 
     // The tabindex is required to support scrolling by arrow keys.
     return (
@@ -165,7 +165,7 @@ class Sidebar extends PureComponent<SidebarProps, State> {
       >
         <StyledSidebarContent isCollapsed={collapsedSidebar}>
           <StyledSidebarNavContainer>
-            <AppNavMenu pages={pages} currentPage={currentScript} />
+            <AppNavMenu pages={pages} currentPage={currentPage} />
           </StyledSidebarNavContainer>
           <StyledSidebarCloseButton>
             <Button kind={Kind.ICON} onClick={this.toggleCollapse}>
@@ -178,7 +178,7 @@ class Sidebar extends PureComponent<SidebarProps, State> {
           chevronDownshift={chevronDownshift}
           isCollapsed={collapsedSidebar}
         >
-          <AppNavMenu pages={pages} currentPage={currentScript} />
+          <AppNavMenu pages={pages} currentPage={currentPage} />
           <StyledDivider />
           <Button kind={Kind.ICON} onClick={this.toggleCollapse}>
             Sidebar
