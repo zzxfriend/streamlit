@@ -66,6 +66,7 @@ import {
   Config,
   IGitInfo,
   GitInfo,
+  IAppPage,
 } from "src/autogen/proto"
 import { without, concat } from "lodash"
 
@@ -135,6 +136,8 @@ interface State {
   gitInfo: IGitInfo | null
   formsData: FormsData
   hideTopBar: boolean
+  pages: IAppPage[]
+  currentPage: string
 }
 
 const ELEMENT_LIST_BUFFER_TIMEOUT_MS = 10
@@ -206,6 +209,8 @@ export class App extends PureComponent<Props, State> {
       // the user would see top bar elements for a few ms if this defaulted to
       // false.
       hideTopBar: true,
+      pages: [],
+      currentPage: "",
     }
 
     this.sessionEventDispatcher = new SessionEventDispatcher()
@@ -592,6 +597,7 @@ export class App extends PureComponent<Props, State> {
     this.setState({
       allowRunOnSave: config.allowRunOnSave,
       hideTopBar: config.hideTopBar,
+      pages: newSessionProto.appPages,
     })
 
     const { appHash } = this.state
@@ -920,6 +926,8 @@ export class App extends PureComponent<Props, State> {
       pageName = window.location.pathname.replace(`/${basePath}`, "")
     }
 
+    this.setState({ currentPage: decodeURI(pageName) })
+
     this.sendBackMsg(
       new BackMsg({
         rerunScript: { queryString, widgetStates, pageName },
@@ -1082,6 +1090,8 @@ export class App extends PureComponent<Props, State> {
       userSettings,
       gitInfo,
       hideTopBar,
+      pages,
+      currentPage,
     } = this.state
 
     const outerDivClass = classNames("stApp", {
@@ -1117,6 +1127,8 @@ export class App extends PureComponent<Props, State> {
           addThemes: this.props.theme.addThemes,
           sidebarChevronDownshift: this.props.s4aCommunication.currentState
             .sidebarChevronDownshift,
+          pages,
+          currentPage,
         }}
       >
         <HotKeys
@@ -1127,7 +1139,7 @@ export class App extends PureComponent<Props, State> {
         >
           <StyledApp className={outerDivClass}>
             {/* The tabindex below is required for testing. */}
-            <Header>
+            <Header elements={elements}>
               {!hideTopBar && (
                 <>
                   <StatusWidget

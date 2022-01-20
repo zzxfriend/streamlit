@@ -36,10 +36,15 @@ export interface Props {
   currentPage?: string
 }
 
+function setDisplayPage(pages?: IAppPage[], currentPage?: string): string {
+  if (pages && pages[0] && currentPage === "") {
+    return pages[0].pageName || ""
+  }
+  return currentPage || ""
+}
+
 function renderPages(pages?: IAppPage[], currentPage?: string): ReactElement {
-  pages = pages || [
-    { scriptPath: "localhost/mainapp", pageName: "this is a page" },
-  ]
+  pages = pages || []
   const pageItems = pages.map((page, idx) => {
     const disabled = currentPage === page.pageName
     return (
@@ -62,35 +67,25 @@ function AppNavMenu(props: Props): ReactElement {
   const { pages, currentPage } = props
   const renderMenu = pages && pages.length > 1
 
+  const displayPage = setDisplayPage(pages, currentPage)
+
   return (
     <>
-      {/* {renderMenu && (<StatefulPopover
-        content={renderPages(pages, currentPage)}
-        placement={PLACEMENT.bottomLeft}
-        triggerType={TRIGGER_TYPE.hover}
-        focusLock
-        autoFocus
-      >
-        <StyledNavButton>
-          {currentPage}
-          <ChevronDown size={24} />
-        </StyledNavButton>
-      </StatefulPopover>) }
-      {!renderMenu && <StyledNavButton>
-          {currentPage}
-        </StyledNavButton>} */}
-      <StatefulPopover
-        content={renderPages(pages, currentPage)}
-        placement={PLACEMENT.bottomLeft}
-        triggerType={TRIGGER_TYPE.hover}
-        focusLock
-        autoFocus
-      >
-        <StyledNavButton>
-          {currentPage}
-          <ChevronDown size={24} />
-        </StyledNavButton>
-      </StatefulPopover>
+      {renderMenu && (
+        <StatefulPopover
+          content={renderPages(pages, displayPage)}
+          placement={PLACEMENT.bottomLeft}
+          triggerType={TRIGGER_TYPE.hover}
+          focusLock
+          autoFocus
+        >
+          <StyledNavButton>
+            {displayPage}
+            <ChevronDown size={24} />
+          </StyledNavButton>
+        </StatefulPopover>
+      )}
+      {!renderMenu && <StyledNavButton>{displayPage}</StyledNavButton>}
     </>
   )
 }
