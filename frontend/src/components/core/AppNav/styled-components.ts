@@ -78,13 +78,16 @@ export const StyledPageItem = styled.li<ItemProps>(
   }
 )
 
-export const StyledPageItemLabel = styled.span(({ theme }) => ({
-  color: theme.colors.bodyText,
-  marginRight: theme.spacing.md,
-  flexGrow: 1,
-  // We do not want to change the font for this based on theme.
-  fontFamily: theme.fonts.sansSerif,
-}))
+export const StyledPageItemLabel = styled.span<ItemProps>(
+  ({ isDisabled, theme }) => ({
+    cursor: isDisabled ? "not-allowed" : "pointer",
+    color: theme.colors.bodyText,
+    marginRight: theme.spacing.md,
+    flexGrow: 1,
+    // We do not want to change the font for this based on theme.
+    fontFamily: theme.fonts.sansSerif,
+  })
+)
 
 export const StyledLink = styled.a(() => ({
   textDecoration: "none",
