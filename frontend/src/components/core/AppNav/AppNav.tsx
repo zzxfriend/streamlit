@@ -47,13 +47,14 @@ function renderPages(pages?: IAppPage[], currentPage?: string): ReactElement {
   pages = pages || []
   const pageItems = pages.map((page, idx) => {
     const disabled = currentPage === page.pageName
+    const pageName = page.pageName ? page.pageName : ""
     return (
       <StyledPageItem
         key={page.pageName}
         isMainPage={idx === 0}
         isDisabled={disabled}
       >
-        <StyledLink href={page.pageName ? page.pageName : ""}>
+        <StyledLink href={`/${pageName}`}>
           <StyledPageItemLabel>{page.pageName}</StyledPageItemLabel>
         </StyledLink>
       </StyledPageItem>
