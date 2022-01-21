@@ -43,22 +43,37 @@ function setDisplayPage(pages?: IAppPage[], currentPage?: string): string {
   return currentPage || ""
 }
 
+function renderLinks(
+  pageName: string,
+  idx: number,
+  disabled: boolean
+): ReactElement {
+  const pageItem = (
+    <StyledPageItem
+      key={pageName}
+      isMainPage={idx === 0}
+      isDisabled={disabled}
+    >
+      <StyledPageItemLabel isDisabled={disabled}>
+        {pageName}
+      </StyledPageItemLabel>
+    </StyledPageItem>
+  )
+
+  return disabled ? (
+    pageItem
+  ) : (
+    <StyledLink href={`/${pageName}`}>{pageItem}</StyledLink>
+  )
+}
+
 function renderPages(pages?: IAppPage[], currentPage?: string): ReactElement {
   pages = pages || []
   const pageItems = pages.map((page, idx) => {
     const disabled = currentPage === page.pageName
     const pageName = page.pageName ? page.pageName : ""
-    return (
-      <StyledPageItem
-        key={page.pageName}
-        isMainPage={idx === 0}
-        isDisabled={disabled}
-      >
-        <StyledLink href={`/${pageName}`}>
-          <StyledPageItemLabel>{page.pageName}</StyledPageItemLabel>
-        </StyledLink>
-      </StyledPageItem>
-    )
+
+    return renderLinks(pageName, idx, disabled)
   })
 
   return <StyledPageList isDisabled={false}>{pageItems}</StyledPageList>
