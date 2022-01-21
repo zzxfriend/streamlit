@@ -328,10 +328,19 @@ class ScriptRunner(object):
         # in their previous script elements disappearing.
 
         try:
+            ctx = get_script_run_ctx()
+            if ctx is None:
+                # This should never be possible on the script_runner thread.
+                raise RuntimeError(
+                    "ScriptRunner thread has a null ScriptRunContext. Something has gone very wrong!"
+                )
+
             if not rerun_data.script_path:
                 script_path = self._session_data.script_path
+                ctx.page_name = ""
             else:
                 script_path = rerun_data.script_path
+                ctx.page_name = rerun_data.page_name
 
             with source_util.open_python_file(script_path) as f:
                 filebody = f.read()
