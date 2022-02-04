@@ -337,6 +337,7 @@ class ScriptRunner:
                     "ScriptRunner thread has a null ScriptRunContext. Something has gone very wrong!"
                 )
 
+            # TODO: Maybe move this logic into the start method?
             if not rerun_data.script_path:
                 script_path = self._session_data.script_path
                 ctx.page_name = ""
