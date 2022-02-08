@@ -24,9 +24,6 @@ from pandas import DataFrame
 from pandas.io.formats.style import Styler
 from streamlit.proto.Arrow_pb2 import Arrow as ArrowProto
 from streamlit.proto.DataEditor_pb2 import DataEditor as DataEditorProto
-from streamlit.proto.InteractiveDataframe_pb2 import (
-    InteractiveDataframe as InteractiveDataframeProto,
-)
 from streamlit.script_run_context import ScriptRunContext, get_script_run_ctx
 from streamlit.state.session_state import (
     WidgetArgs,
@@ -571,7 +568,7 @@ class ArrowMixin:
 
 
 def marshall(
-    proto: Union[ArrowProto, InteractiveDataframeProto, DataEditorProto],
+    proto: Union[ArrowProto, DataEditorProto],
     data: Data,
     default_uuid: Optional[str] = None,
 ) -> None:
