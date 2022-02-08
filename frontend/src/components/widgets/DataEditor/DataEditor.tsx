@@ -130,7 +130,6 @@ function getColumns(
 
   const columnsConfig = JSON.parse(columnsConfigStr)
 
-  console.log(columnsConfigStr)
   // 50 for 4 length
   // calculate the column widths to max out the space.
   // We need to subtract the left column
@@ -602,7 +601,6 @@ export function DataEditor({
 
   // numRows +2 because of header and footer, and +2 to total because of border?
   const height = propHeight || Math.min((numRows + 2) * ROW_HEIGHT + 2, 400)
-  console.log((element.widget as WidgetInfo).id)
 
   useEventListener(
     "keydown",
@@ -615,7 +613,6 @@ export function DataEditor({
       if (event.key === "Escape") {
         // TODO: workaround to reset selection
         // Since all selection callbacks are fired, we cannot easily reset the state with those callbacks
-        console.log("Escape pressed")
         const currentState = getCurrentState(element, widgetMgr)
         if (
           currentState.selections !== undefined &&
@@ -735,18 +732,15 @@ export function DataEditor({
               (element.widget as DataEditorProto).rowSelectionMode ===
               DataEditorProto.SelectionMode.DEACTIVATED
             ) {
-              console.log("Row selection deactivated")
               return
             }
 
             if (JSON.stringify(selectedRows) === JSON.stringify(newRows)) {
-              console.log("Row selected: nothing changed")
               // nothing changed, so don't update the state
               // this callback is also triggered when the colum selection is changed
               return
             }
 
-            console.log("Row selection changed")
             setSelectedRows(newRows)
             const currentState = getCurrentState(element, widgetMgr)
             currentState.selections = []
@@ -770,26 +764,20 @@ export function DataEditor({
           }}
           selectedColumns={selectedColumns}
           onSelectedColumnsChange={(newColumns: CompactSelection, trigger) => {
-            console.log(gridSelection)
-            console.log(selectedRows)
-            console.log(newColumns)
             if (
               (element.widget as DataEditorProto).columnSelectionMode ===
               DataEditorProto.SelectionMode.DEACTIVATED
             ) {
-              console.log("Column selection deactivated")
               return
             }
             if (
               JSON.stringify(selectedColumns) === JSON.stringify(newColumns)
             ) {
-              console.log("Col Selected: nothing changed")
               // nothing changed, so don't update the state
               // this callback is also triggered when the row selection is changed
               return
             }
 
-            console.log("Column selection changed")
             setSelectedColumns(newColumns)
             const currentState = getCurrentState(element, widgetMgr)
             currentState.selections = []
@@ -812,14 +800,12 @@ export function DataEditor({
             }
           }}
           onGridSelectionChange={(newVal: GridSelection | undefined) => {
-            console.log("GRID selection changed", newVal)
             setGridSelection(newVal)
 
             if (
               (element.widget as DataEditorProto).cellSelectionMode ===
               DataEditorProto.SelectionMode.DEACTIVATED
             ) {
-              console.log("Cell selection deactivated")
               return
             }
 
@@ -849,14 +835,13 @@ export function DataEditor({
             }
           }}
           onCellClicked={(cell: readonly [number, number]) => {
-            console.log(cell)
+            //console.log(cell)
           }}
           onCellEdited={(
             [col, row]: readonly [number, number],
             val: GridCell
           ): void => {
             if ((element.widget as DataEditorProto).editable === false) {
-              console.log("Cell editing is deactivated")
               return
             }
 

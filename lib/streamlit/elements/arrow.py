@@ -321,6 +321,7 @@ class ArrowMixin:
         if not isinstance(on_selection_change, list):
             on_selection_change = [on_selection_change]
 
+        is_list_input = type(data) == list
         single_row_selection_callbacks = []
         multi_row_selection_callbacks = []
         single_column_selection_callbacks = []
@@ -504,6 +505,17 @@ class ArrowMixin:
                         elif row is not None:
                             if row + 1 <= new_df.shape[0]:
                                 row_selection_changes.append(Row(row, new_df.iloc[row]))
+
+        if is_list_input:
+            # TODO: Smarter handling
+            if return_value is None or len(return_value) == 0:
+                return_value = []
+            elif return_value.shape[1] == 1:
+                # Return as list with single value
+                return_value = return_value.iloc[:, 0].to_list()
+            else:
+                # Return as list of dicts
+                return_value = return_value.to_dict(orient="records")
 
         self.dg._enqueue(
             "data_editor",
