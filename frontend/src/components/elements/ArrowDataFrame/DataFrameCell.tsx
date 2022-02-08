@@ -76,6 +76,16 @@ export interface DataFrameCellProps {
    * {@link DataFrame} uses this to toggle column sorting.
    */
   headerClickedCallback?: (columnIndex: number) => void
+
+  /**
+   * An optional callback that will be called when a cell is clicked.
+   * The callback will be passed this cell's columnIndex, rowIndex and content.
+   */
+  cellClickedCallback?: (
+    columnIndex: number,
+    rowIndex: number,
+    contents: string
+  ) => void
 }
 
 export default function DataFrameCell({
@@ -90,6 +100,7 @@ export default function DataFrameCell({
   isNumeric,
   id,
   headerClickedCallback,
+  cellClickedCallback,
 }: DataFrameCellProps): ReactElement {
   const isHeader = rowIndex === 0
 
@@ -97,10 +108,16 @@ export default function DataFrameCell({
   let role
   let tabIndex
 
-  if (headerClickedCallback != null) {
-    onClick = () => headerClickedCallback(columnIndex)
-    role = "button"
-    tabIndex = 0
+  if (isHeader) {
+    if (headerClickedCallback != null) {
+      // header callback for column sorting
+      onClick = () => headerClickedCallback(columnIndex)
+      role = "button"
+      tabIndex = 0
+    }
+  } else if (cellClickedCallback != null) {
+    // cell callback for value selection
+    onClick = () => cellClickedCallback(columnIndex, rowIndex, contents)
   }
 
   return (

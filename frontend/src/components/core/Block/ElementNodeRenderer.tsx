@@ -124,6 +124,9 @@ const VegaLiteChart = React.lazy(() =>
 const Video = React.lazy(() => import("src/components/elements/Video/"))
 
 // Lazy-load widgets.
+const DataEditor = React.lazy(() =>
+  import("src/components/widgets/DataEditor")
+)
 const Button = React.lazy(() => import("src/components/widgets/Button/"))
 const DownloadButton = React.lazy(() =>
   import("src/components/widgets/DownloadButton/")
@@ -220,6 +223,7 @@ const RawElementNodeRenderer = (
           element={node.quiverElement as Quiver}
           width={width}
           height={height}
+          {...widgetProps}
         />
       )
 
@@ -358,6 +362,16 @@ const RawElementNodeRenderer = (
       return <Video width={width} element={node.element.video as VideoProto} />
 
     // Widgets
+
+    case "dataEditor":
+      return (
+        <DataEditor
+          element={node.quiverElement as Quiver}
+          width={width}
+          height={height}
+          {...widgetProps}
+        />
+      )
 
     case "button": {
       const buttonProto = node.element.button as ButtonProto

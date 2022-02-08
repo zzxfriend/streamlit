@@ -173,7 +173,8 @@ export class ElementNode implements AppNode {
 
     if (
       this.element.type !== "arrowTable" &&
-      this.element.type !== "arrowDataFrame"
+      this.element.type !== "arrowDataFrame" &&
+      this.element.type !== "dataEditor"
     ) {
       throw new Error(
         `elementType '${this.element.type}' is not a valid Quiver element!`
@@ -256,6 +257,7 @@ export class ElementNode implements AppNode {
 
     switch (elementType) {
       case "arrowTable":
+      case "dataEditor":
       case "arrowDataFrame": {
         newNode.lazyQuiverElement = ElementNode.quiverAddRowsHelper(
           this.quiverElement,

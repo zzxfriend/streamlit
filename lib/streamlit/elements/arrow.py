@@ -12,21 +12,112 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
+import json
+from collections import namedtuple
 from collections.abc import Iterable
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Union, cast, get_type_hints
 
+import pyarrow as pa
 from numpy import ndarray
 from pandas import DataFrame
 from pandas.io.formats.style import Styler
-import pyarrow as pa
+from streamlit.proto.Arrow_pb2 import Arrow as ArrowProto
+from streamlit.proto.DataEditor_pb2 import DataEditor as DataEditorProto
+from streamlit.proto.InteractiveDataframe_pb2 import (
+    InteractiveDataframe as InteractiveDataframeProto,
+)
+from streamlit.script_run_context import ScriptRunContext, get_script_run_ctx
+from streamlit.state.session_state import (
+    WidgetArgs,
+    WidgetCallback,
+    WidgetKwargs,
+    get_session_state,
+)
+from streamlit.state.widgets import _get_widget_id, register_widget
+from streamlit.type_util import Key, to_key
 
 import streamlit
 from streamlit import type_util
-from streamlit.proto.Arrow_pb2 import Arrow as ArrowProto
+
+from .form import current_form_id
 
 Data = Optional[
     Union[DataFrame, Styler, pa.Table, ndarray, Iterable, Dict[str, List[Any]]]
 ]
+
+Cell = namedtuple("Cell", "row column value")
+Row = namedtuple("Row", "row value")
+Column = namedtuple("Column", "column name value")
+
+from dataclasses import dataclass
+from enum import Enum
+
+
+def _configure_column(
+    title: Optional[str] = None,
+    width: Optional[int] = None,
+    editable: Optional[bool] = None,
+    type: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Configure a data editor column.
+
+    Parameters
+    ----------
+    title : Optional[str]
+        The column title.
+
+    width : Optional[int]
+        The column initial width.
+
+    editable : Optional[bool]
+        Whether the cells in the column are editable.
+
+    type : ptional[str]
+        The data type of the column. Type must be one of:
+        int, float, string, text, datetime, time, date, boolean, id, markdown, image, url, uri.
+
+    """
+
+    column_config = {}
+
+    if title:
+        if title.isnumeric():
+            raise ValueError("title cannot be numeric.")
+
+        column_config["title"] = title
+
+    if width is not None:
+        if width < 25:
+            raise ValueError("width must be at least 25.")
+
+        column_config["width"] = width
+
+    if editable is not None:
+        column_config["editable"] = editable
+
+    if type is not None:
+        if type not in [
+            "int",
+            "float",
+            "string",
+            "text",
+            "datetime",
+            "time",
+            "date",
+            "boolean",
+            "id",
+            "markdown",
+            "image",
+            "url",
+            "uri",
+        ]:
+            raise ValueError(
+                "type must be one of: int, float, string, text, datetime, time, date, boolean, id, markdown, image, url, uri"
+            )
+        column_config["type"] = type
+
+    return column_config
 
 
 class ArrowMixin:
@@ -35,6 +126,11 @@ class ArrowMixin:
         data: Data = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
+        key: Optional[Key] = None,
+        on_click: Optional[WidgetCallback] = None,
+        args: Optional[WidgetArgs] = None,
+        kwargs: Optional[WidgetKwargs] = None,
+        disabled: bool = False,
     ) -> "streamlit.delta_generator.DeltaGenerator":
         """Display a dataframe as an interactive table.
 
@@ -75,17 +171,337 @@ class ArrowMixin:
         # If pandas.Styler uuid is not provided, a hash of the position
         # of the element will be used. This will cause a rerender of the table
         # when the position of the element is changed.
+
         delta_path = self.dg._get_delta_path_str()
         default_uuid = str(hash(delta_path))
 
-        proto = ArrowProto()
-        marshall(proto, data, default_uuid)
+        dataframe_proto = InteractiveDataframeProto()
+        dataframe_proto.disabled = disabled
+        dataframe_proto.form_id = current_form_id(self.dg)
+        marshall(dataframe_proto, data, default_uuid)
+
+        def deserialize_dataframe_event(ui_value, widget_id=""):
+            return ui_value if ui_value is not None else {}
+
+        def serialize_dataframe_event(v):
+            return json.dumps(v)
+
+        # get_session_state()
+
+        current_value, _ = register_widget(
+            "arrow_data_frame",
+            dataframe_proto,
+            user_key=to_key(key),
+            on_change_handler=on_click,
+            args=args,
+            kwargs=kwargs,
+            deserializer=deserialize_dataframe_event,
+            serializer=serialize_dataframe_event,
+            ctx=get_script_run_ctx(),
+        )
+
+        # NoValue
         return cast(
             "streamlit.delta_generator.DeltaGenerator",
             self.dg._enqueue(
-                "arrow_data_frame", proto, element_width=width, element_height=height
+                "arrow_data_frame",
+                dataframe_proto,
+                element_width=width,
+                element_height=height,
             ),
         )
+
+    def _arrow_interactive_dataframe(
+        self,
+        data: Data = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        key: Optional[Key] = None,
+        on_click: Optional[Union[WidgetCallback, bool]] = None,
+        on_select: Optional[Union[WidgetCallback, bool]] = None,
+        args: Optional[WidgetArgs] = None,
+        kwargs: Optional[WidgetKwargs] = None,
+    ) -> "streamlit.delta_generator.DeltaGenerator":
+        if on_click is None and on_select is None:
+            return self._arrow_dataframe(data, width, height)
+
+        # If pandas.Styler uuid is not provided, a hash of the position
+        # of the element will be used. This will cause a rerender of the table
+        # when the position of the element is changed.
+        delta_path = self.dg._get_delta_path_str()
+        default_uuid = str(hash(delta_path))
+
+        data_editor_proto = DataEditorProto()
+        data_editor_proto.disabled = False
+        data_editor_proto.editable = False
+        data_editor_proto.form_id = current_form_id(self.dg)
+        data_editor_proto.columns = "{}"
+        data_editor_proto.column_selection_mode = (
+            DataEditorProto.SelectionMode.DEACTIVATED
+        )
+        data_editor_proto.row_selection_mode = DataEditorProto.SelectionMode.DEACTIVATED
+        data_editor_proto.cell_selection_mode = DataEditorProto.SelectionMode.SINGLE
+
+        marshall(data_editor_proto, data, default_uuid)
+
+        def deserialize_data_editor_event(ui_value, widget_id=""):
+            if ui_value is None:
+                return {}
+            if isinstance(ui_value, str):
+                return json.loads(ui_value)
+
+            return ui_value
+
+        def serialize_data_editor_event(v):
+            return json.dumps(v, default=str)
+
+        current_value, _ = register_widget(
+            "data_editor",
+            data_editor_proto,
+            user_key=to_key(key),
+            on_change_handler=None,
+            args=args,
+            kwargs=kwargs,
+            deserializer=deserialize_data_editor_event,
+            serializer=serialize_data_editor_event,
+            ctx=get_script_run_ctx(),
+        )
+
+        return cast(
+            "streamlit.delta_generator.DeltaGenerator",
+            self.dg._enqueue(
+                "data_editor",
+                data_editor_proto,
+                element_width=width,
+                element_height=height,
+            ),
+        )
+
+    def _arrow_data_editor(
+        self,
+        data: Data = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        key: Optional[Key] = None,
+        args: Optional[WidgetArgs] = None,
+        kwargs: Optional[WidgetKwargs] = None,
+        on_change: Optional[WidgetCallback] = None,
+        # Custom parameters:
+        on_selection_change: Optional[Union[Callable, List[Callable]]] = None,
+        columns: Optional[Dict[Union[int, str], dict]] = None,
+        editable: bool = True,
+    ) -> Data:
+
+        if columns is None:
+            columns = {}
+
+        if on_selection_change is None:
+            on_selection_change = []
+
+        if not isinstance(on_selection_change, list):
+            on_selection_change = [on_selection_change]
+
+        single_row_selection_callbacks = []
+        multi_row_selection_callbacks = []
+        single_column_selection_callbacks = []
+        multi_column_selection_callbacks = []
+        single_cell_selection_callbacks = []
+        multi_cell_selection_callbacks = []
+
+        for selection_callback in on_selection_change:
+            # Also use type for selection, via: get_type_hints
+            arguments = inspect.getfullargspec(selection_callback).args
+            if "cell" in arguments:
+                single_cell_selection_callbacks.append(selection_callback)
+
+            if "cells" in arguments:
+                multi_cell_selection_callbacks.append(selection_callback)
+
+            if "row" in arguments:
+                single_row_selection_callbacks.append(selection_callback)
+
+            if "rows" in arguments:
+                multi_row_selection_callbacks.append(selection_callback)
+
+            if "column" in arguments:
+                single_column_selection_callbacks.append(selection_callback)
+
+            if "columns" in arguments:
+                multi_column_selection_callbacks.append(selection_callback)
+
+            # TODO: warning message if there is a problem
+
+        # If pandas.Styler uuid is not provided, a hash of the position
+        # of the element will be used. This will cause a rerender of the table
+        # when the position of the element is changed.
+        delta_path = self.dg._get_delta_path_str()
+        default_uuid = str(hash(delta_path))
+
+        data_editor_proto = DataEditorProto()
+        data_editor_proto.disabled = False
+        data_editor_proto.editable = editable
+        data_editor_proto.form_id = current_form_id(self.dg)
+        data_editor_proto.columns = json.dumps(columns)
+
+        # Determine column selection mode
+        if len(multi_column_selection_callbacks) > 0:
+            data_editor_proto.column_selection_mode = (
+                DataEditorProto.SelectionMode.MULTI
+            )
+        elif len(single_column_selection_callbacks) > 0:
+            data_editor_proto.column_selection_mode = (
+                DataEditorProto.SelectionMode.SINGLE
+            )
+        else:
+            data_editor_proto.column_selection_mode = (
+                DataEditorProto.SelectionMode.DEACTIVATED
+            )
+
+        # Determine cell selection mode
+        if len(multi_cell_selection_callbacks) > 0:
+            data_editor_proto.cell_selection_mode = DataEditorProto.SelectionMode.MULTI
+        elif len(single_cell_selection_callbacks) > 0:
+            data_editor_proto.cell_selection_mode = DataEditorProto.SelectionMode.SINGLE
+        else:
+            data_editor_proto.cell_selection_mode = (
+                DataEditorProto.SelectionMode.DEACTIVATED
+            )
+
+        # Determine row selection mode
+        if len(multi_row_selection_callbacks) > 0:
+            data_editor_proto.row_selection_mode = DataEditorProto.SelectionMode.MULTI
+        elif len(single_row_selection_callbacks) > 0:
+            data_editor_proto.row_selection_mode = DataEditorProto.SelectionMode.SINGLE
+        else:
+            data_editor_proto.row_selection_mode = (
+                DataEditorProto.SelectionMode.DEACTIVATED
+            )
+
+        marshall(data_editor_proto, data, default_uuid)
+
+        session_state = get_session_state()
+        old_state = None
+        widget_id = _get_widget_id("data_editor", data_editor_proto, to_key(key))
+        if widget_id in session_state._old_state:
+            old_state = session_state._old_state[widget_id]
+
+        def deserialize_data_editor_event(ui_value, widget_id=""):
+            if ui_value is None:
+                return {}
+            if isinstance(ui_value, str):
+                return json.loads(ui_value)
+
+            return ui_value
+
+        def serialize_data_editor_event(v):
+            return json.dumps(v, default=str)
+
+        current_value, _ = register_widget(
+            "data_editor",
+            data_editor_proto,
+            user_key=to_key(key),
+            on_change_handler=on_change,
+            args=args,
+            kwargs=kwargs,
+            deserializer=deserialize_data_editor_event,
+            serializer=serialize_data_editor_event,
+            ctx=get_script_run_ctx(),
+        )
+
+        return_value = None
+        if not isinstance(data, DataFrame):
+            data = type_util.convert_anything_to_df(data)
+
+        new_df = data.copy()
+        if current_value and "edits" in current_value:
+            for edit in current_value["edits"].keys():
+                col, row = edit.split(":")
+                col, row = int(col), int(row)
+                # TODO: Check cols as well
+                if row + 1 > new_df.shape[0]:
+                    # it is possible thtat there are multiple rows to add
+                    # this happens if mulitple lines are added without edits
+                    for row_idx in range(new_df.shape[0], row + 1):
+                        # Append new row with empty values
+                        print("add row", row_idx)
+                        new_df.iloc[row_idx] = [None for _ in range(new_df.shape[1])]
+                new_df.iat[row, col] = current_value["edits"][edit]
+
+            return_value = new_df
+
+            if (
+                len(multi_row_selection_callbacks) > 0
+                or len(single_row_selection_callbacks) > 0
+                or len(multi_column_selection_callbacks) > 0
+                or len(single_column_selection_callbacks) > 0
+                or len(multi_cell_selection_callbacks) > 0
+                or len(single_cell_selection_callbacks) > 0
+            ):
+                new_selections = None
+                old_selections = None
+
+                if current_value is not None and "selections" in current_value:
+                    new_selections = current_value["selections"]
+
+                if old_state is not None and "selections" in old_state:
+                    old_selections = old_state["selections"]
+
+                if new_selections is not None and new_selections != old_selections:
+                    column_selection_changes = []
+                    row_selection_changes = []
+                    cell_selection_changes = []
+
+                    # changes in selection
+                    for selection in new_selections:
+                        col, row = selection.split(":")
+                        if col:
+                            col = int(col)
+                        else:
+                            col = None
+
+                        if row:
+                            row = int(row)
+                        else:
+                            row = None
+
+                        if col is not None and row is not None:
+                            if (
+                                row + 1 <= new_df.shape[0]
+                                and col + 1 <= new_df.shape[1]
+                            ):
+                                value = new_df.iloc[row, col]
+                                if hasattr(value, "item"):
+                                    value = value.item()
+                                cell_selection_changes.append(Cell(col, row, value))
+                        elif col is not None:
+                            if col + 1 <= new_df.shape[1]:
+                                column_selection_changes.append(
+                                    Column(
+                                        col, new_df.columns[col], new_df.iloc[:, col]
+                                    )
+                                )
+                        elif row is not None:
+                            if row + 1 <= new_df.shape[0]:
+                                row_selection_changes.append(Row(row, new_df.iloc[row]))
+
+                    # args = args or ()
+                    # kwargs = kwargs or {}
+                    # on_click(*args, **kwargs)
+
+                    # if to_key(key) is not None and to_key(key) in session_state:
+                    #     Click = namedtuple("Click", "value row column")
+                    #     and len(new_selections) == 1
+                    #             session_state[to_key(key)]["click"] = Click(
+                    #                 value, row, col
+                    #             )
+
+        self.dg._enqueue(
+            "data_editor",
+            data_editor_proto,
+            element_width=width,
+            element_height=height,
+        ),
+        return return_value
 
     def _arrow_table(
         self, data: Data = None
@@ -128,7 +544,11 @@ class ArrowMixin:
         return cast("streamlit.delta_generator.DeltaGenerator", self)
 
 
-def marshall(proto: ArrowProto, data: Data, default_uuid: Optional[str] = None) -> None:
+def marshall(
+    proto: Union[ArrowProto, InteractiveDataframeProto, DataEditorProto],
+    data: Data,
+    default_uuid: Optional[str] = None,
+) -> None:
     """Marshall pandas.DataFrame into an Arrow proto.
 
     Parameters
@@ -404,3 +824,7 @@ def _use_display_values(df: DataFrame, styles: Dict[str, Any]) -> DataFrame:
                     new_df.iat[r, c] = str(cell["display_value"])
 
     return new_df
+
+
+# Todo: does this work
+ArrowMixin._arrow_data_editor.configure_column = _configure_column

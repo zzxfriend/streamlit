@@ -404,9 +404,18 @@ export class WidgetStateManager {
     return undefined
   }
 
-  public setJsonValue(widget: WidgetInfo, value: any, source: Source): void {
+  public setJsonValue(
+    widget: WidgetInfo,
+    value: any,
+    source: Source,
+    event = false
+  ): void {
     this.createWidgetState(widget, source).jsonValue = JSON.stringify(value)
     this.onWidgetValueChanged(widget.formId, source)
+    if (event) {
+      // Events should not store the widget state
+      this.deleteWidgetState(widget.id)
+    }
   }
 
   public setArrowValue(

@@ -660,19 +660,19 @@ export const globalStyles = (theme: Theme): any => css`
 
   // Make scrollbars awesome in Chrome
 
-  ::-webkit-scrollbar {
+  :not(.dvn-scroller)::-webkit-scrollbar {
     background: transparent;
     border-radius: 100px;
     height: 6px;
     width: 6px;
   }
 
-  ::-webkit-scrollbar:active {
+  :not(.dvn-scroller)::-webkit-scrollbar:active {
     background: ${theme.colors.fadedText10};
   }
 
-  :hover::-webkit-scrollbar-thumb:vertical,
-  :hover::-webkit-scrollbar-thumb:horizontal {
+  :not(.dvn-scroller):hover::-webkit-scrollbar-thumb:vertical,
+  :not(.dvn-scroller):hover::-webkit-scrollbar-thumb:horizontal {
     background: ${theme.colors.fadedText40};
     border-radius: 100px;
   }

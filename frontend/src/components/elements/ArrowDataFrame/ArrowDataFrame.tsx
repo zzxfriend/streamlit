@@ -20,6 +20,9 @@ import { MultiGrid } from "react-virtualized"
 
 import withFullScreenWrapper from "src/hocs/withFullScreenWrapper"
 import { DataType, Quiver } from "src/lib/Quiver"
+import { WidgetInfo, WidgetStateManager } from "src/lib/WidgetStateManager"
+
+import { InteractiveDataframe as InteractiveDataframeProto } from "src/autogen/proto"
 import { SortDirection } from "./SortDirection"
 import DataFrameCell from "./DataFrameCell"
 import {
@@ -39,6 +42,8 @@ export interface DataFrameProps {
   element: Quiver
   height?: number
   width: number
+  disabled: boolean
+  widgetMgr: WidgetStateManager
 }
 
 /**
@@ -48,6 +53,8 @@ export function ArrowDataFrame({
   element,
   height: propHeight,
   width,
+  disabled,
+  widgetMgr,
 }: DataFrameProps): ReactElement {
   const multiGridRef = React.useRef<MultiGrid>(null)
 
@@ -148,6 +155,17 @@ export function ArrowDataFrame({
           sortedByUser={sortedByUser}
           columnSortDirection={columnSortDirection}
           headerClickedCallback={headerClickedCallback}
+          cellClickedCallback={
+            (columnIndex, rowIndex, contents) =>
+              widgetMgr.setJsonValue(
+                element.widget as WidgetInfo,
+                { value: contents, row: rowIndex, column: columnIndex },
+                { fromUi: true }
+              )
+            // alert(
+            //   `row: ${rowIndex} column: ${columnIndex} contents: ${contents}`
+            // )
+          }
         />
       )
     }

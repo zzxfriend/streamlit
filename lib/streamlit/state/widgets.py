@@ -16,17 +16,17 @@ import hashlib
 import textwrap
 from typing import Any, Dict, Optional, Tuple, Union
 
-
-from streamlit.script_run_context import ScriptRunContext
 from streamlit.errors import DuplicateWidgetID
 from streamlit.proto.Button_pb2 import Button
-from streamlit.proto.Checkbox_pb2 import Checkbox
 from streamlit.proto.CameraInput_pb2 import CameraInput
+from streamlit.proto.Checkbox_pb2 import Checkbox
 from streamlit.proto.ColorPicker_pb2 import ColorPicker
 from streamlit.proto.Components_pb2 import ComponentInstance
+from streamlit.proto.DataEditor_pb2 import DataEditor
 from streamlit.proto.DateInput_pb2 import DateInput
 from streamlit.proto.DownloadButton_pb2 import DownloadButton
 from streamlit.proto.FileUploader_pb2 import FileUploader
+from streamlit.proto.InteractiveDataframe_pb2 import InteractiveDataframe
 from streamlit.proto.MultiSelect_pb2 import MultiSelect
 from streamlit.proto.NumberInput_pb2 import NumberInput
 from streamlit.proto.Radio_pb2 import Radio
@@ -35,15 +35,16 @@ from streamlit.proto.Slider_pb2 import Slider
 from streamlit.proto.TextArea_pb2 import TextArea
 from streamlit.proto.TextInput_pb2 import TextInput
 from streamlit.proto.TimeInput_pb2 import TimeInput
-from streamlit.proto.WidgetStates_pb2 import WidgetStates, WidgetState
+from streamlit.proto.WidgetStates_pb2 import WidgetState, WidgetStates
+from streamlit.script_run_context import ScriptRunContext
 from streamlit.state.session_state import (
     GENERATED_WIDGET_KEY_PREFIX,
-    WidgetMetadata,
-    WidgetSerializer,
     WidgetArgs,
     WidgetCallback,
     WidgetDeserializer,
     WidgetKwargs,
+    WidgetMetadata,
+    WidgetSerializer,
 )
 
 # Protobuf types for all widgets.
@@ -64,6 +65,8 @@ WidgetProto = Union[
     TextArea,
     TextInput,
     TimeInput,
+    InteractiveDataframe,
+    DataEditor,
 ]
 
 
@@ -196,6 +199,8 @@ element_type_to_value_type = {
     "text_area": "string_value",
     "text_input": "string_value",
     "time_input": "string_value",
+    "arrow_data_frame": "json_value",
+    "data_editor": "json_value",
     "component_instance": "json_value",
 }
 

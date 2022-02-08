@@ -68,8 +68,15 @@ const StyledDataFrameCell = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-start",
-
-  "&focus-visible, &:focus": {
+  "&:hover": {
+    backgroundColor: theme.colors.fadedText10,
+    cursor: "pointer",
+  },
+  "&:active": {
+    backgroundColor: theme.colors.secondaryBg,
+    cursor: "pointer",
+  },
+  "&:focus-visible, &:focus": {
     outline: "none",
   },
 }))
