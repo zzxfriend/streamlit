@@ -124,7 +124,8 @@ checkbox = _main.checkbox
 code = _main.code
 columns = _main.columns
 container = _main.container
-dataframe = _main.dataframe
+dataframe = _main._arrow_interactive_dataframe
+data_editor = _main._arrow_data_editor
 date_input = _main.date_input
 download_button = _main.download_button
 expander = _main.expander
@@ -179,7 +180,7 @@ _legacy_line_chart = _main._legacy_line_chart
 _legacy_vega_lite_chart = _main._legacy_vega_lite_chart
 
 # Apache Arrow
-_arrow_dataframe = _main._arrow_dataframe
+_arrow_dataframe = _main._arrow_interactive_dataframe
 _arrow_table = _main._arrow_table
 _arrow_altair_chart = _main._arrow_altair_chart
 _arrow_area_chart = _main._arrow_area_chart

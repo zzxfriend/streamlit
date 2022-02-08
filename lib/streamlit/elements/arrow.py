@@ -200,9 +200,26 @@ class ArrowMixin:
             DataEditorProto.SelectionMode.DEACTIVATED
         )
         data_editor_proto.row_selection_mode = DataEditorProto.SelectionMode.DEACTIVATED
-        data_editor_proto.cell_selection_mode = DataEditorProto.SelectionMode.SINGLE
+        if on_click or on_select:
+            data_editor_proto.cell_selection_mode = DataEditorProto.SelectionMode.SINGLE
+        else:
+            data_editor_proto.cell_selection_mode = (
+                DataEditorProto.SelectionMode.DEACTIVATED
+            )
 
         marshall(data_editor_proto, data, default_uuid)
+
+        session_state = get_session_state()
+        if on_click and not on_select:
+            # On click events should only be removed from session state for next reload
+            session_state[to_key(key)] = None
+
+        old_state = None
+        widget_id = _get_widget_id(
+            "data_editor", data_editor_proto, None
+        )  # TODO: never use widget key here
+        if widget_id in session_state._old_state:
+            old_state = session_state._old_state[widget_id]
 
         def deserialize_data_editor_event(ui_value, widget_id=""):
             if ui_value is None:
@@ -218,7 +235,7 @@ class ArrowMixin:
         current_value, _ = register_widget(
             "data_editor",
             data_editor_proto,
-            user_key=to_key(key),
+            user_key=None,  # TODO: Never use widget key here
             on_change_handler=None,
             args=args,
             kwargs=kwargs,
@@ -226,6 +243,49 @@ class ArrowMixin:
             serializer=serialize_data_editor_event,
             ctx=get_script_run_ctx(),
         )
+
+        if on_click or on_select:
+            new_selections = None
+            old_selections = None
+
+            if current_value is not None and "selections" in current_value:
+                new_selections = current_value["selections"]
+
+            if old_state is not None and "selections" in old_state:
+                old_selections = old_state["selections"]
+
+            if new_selections is not None and new_selections != old_selections:
+                if not isinstance(data, DataFrame):
+                    data = type_util.convert_anything_to_df(data)
+
+                # changes in selection
+                for selection in new_selections:
+                    col, row = selection.split(":")
+                    if not col or not row:
+                        # Not a cell selection
+                        continue
+                    col, row = int(col), int(row)
+
+                    if col is not None and row is not None:
+                        if row + 1 <= data.shape[0] and col + 1 <= data.shape[1]:
+                            value = data.iloc[row, col]
+                            if hasattr(value, "item"):
+                                value = value.item()
+
+                            if to_key(key) is not None:
+                                session_state[to_key(key)] = Cell(row, col, value)
+
+                            args = args or ()
+                            kwargs = kwargs or {}
+
+                            if callable(on_click):
+                                on_click(*args, **kwargs)
+
+                            if callable(on_select):
+                                on_select(*args, **kwargs)
+
+                            # TODO: only trigger on the first selection
+                            break
 
         return cast(
             "streamlit.delta_generator.DeltaGenerator",
@@ -373,6 +433,7 @@ class ArrowMixin:
             data = type_util.convert_anything_to_df(data)
 
         new_df = data.copy()
+        return_value = new_df
         if current_value and "edits" in current_value:
             for edit in current_value["edits"].keys():
                 col, row = edit.split(":")
@@ -383,8 +444,8 @@ class ArrowMixin:
                     # this happens if mulitple lines are added without edits
                     for row_idx in range(new_df.shape[0], row + 1):
                         # Append new row with empty values
-                        print("add row", row_idx)
-                        new_df.iloc[row_idx] = [None for _ in range(new_df.shape[1])]
+                        # TODO: use iloc? cannot add rows?
+                        new_df.loc[row_idx] = [None for _ in range(new_df.shape[1])]
                 new_df.iat[row, col] = current_value["edits"][edit]
 
             return_value = new_df
@@ -443,17 +504,6 @@ class ArrowMixin:
                         elif row is not None:
                             if row + 1 <= new_df.shape[0]:
                                 row_selection_changes.append(Row(row, new_df.iloc[row]))
-
-                    # args = args or ()
-                    # kwargs = kwargs or {}
-                    # on_click(*args, **kwargs)
-
-                    # if to_key(key) is not None and to_key(key) in session_state:
-                    #     Click = namedtuple("Click", "value row column")
-                    #     and len(new_selections) == 1
-                    #             session_state[to_key(key)]["click"] = Click(
-                    #                 value, row, col
-                    #             )
 
         self.dg._enqueue(
             "data_editor",
@@ -787,4 +837,4 @@ def _use_display_values(df: DataFrame, styles: Dict[str, Any]) -> DataFrame:
 
 
 # Todo: does this work
-ArrowMixin._arrow_data_editor.configure_column = _configure_column
+# ArrowMixin._arrow_data_editor.configure_column = _configure_column
