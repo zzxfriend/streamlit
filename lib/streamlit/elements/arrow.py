@@ -210,9 +210,13 @@ class ArrowMixin:
         marshall(data_editor_proto, data, default_uuid)
 
         session_state = get_session_state()
+        if to_key(key) not in session_state:
+            # The sessions state of this should alway be initalized
+            session_state[to_key(key)] = Cell(None, None, None)
+
         if on_click and not on_select:
             # On click events should only be removed from session state for next reload
-            session_state[to_key(key)] = None
+            session_state[to_key(key)] = Cell(None, None, None)
 
         old_state = None
         widget_id = _get_widget_id(
