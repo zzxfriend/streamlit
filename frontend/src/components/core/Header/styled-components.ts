@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2021 Streamlit Inc.
+ * Copyright 2018-2022 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,16 @@ export const StyledHeaderDecoration = styled.div(({ theme }) => ({
   height: "0.125rem",
   backgroundImage: `linear-gradient(90deg, ${theme.colors.red70}, #fffd80)`,
   zIndex: theme.zIndices.header,
+}))
+
+export const StyledHeaderPageNav = styled.div(({ theme }) => ({
+  position: "absolute",
+  top: theme.spacing.sm,
+  left: theme.spacing.lg,
+  height: theme.sizes.headerHeight,
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
 }))
 
 export const StyledHeaderToolbar = styled.div(({ theme }) => ({

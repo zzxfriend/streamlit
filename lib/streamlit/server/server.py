@@ -1,4 +1,4 @@
-# Copyright 2018-2021 Streamlit Inc.
+# Copyright 2018-2022 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import tornado.websocket
 from tornado.websocket import WebSocketHandler
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
+import jwt
 
 from streamlit import config
 from streamlit import file_util
@@ -84,6 +85,7 @@ from streamlit.server.server_util import is_url_from_allowed_origins
 from streamlit.server.server_util import make_url_path_regex
 from streamlit.server.server_util import serialize_forward_msg
 from streamlit.server.server_util import get_max_message_size_bytes
+from streamlit.source_util import get_pages
 from streamlit.watcher.local_sources_watcher import LocalSourcesWatcher
 
 
@@ -119,7 +121,7 @@ class SessionInfo:
     """Type stored in our _session_info_by_id dict.
 
     For each AppSession, the server tracks that session's
-    report_run_count. This is used to track the age of messages in
+    script_run_count. This is used to track the age of messages in
     the ForwardMsgCache.
     """
 
@@ -131,11 +133,11 @@ class SessionInfo:
         session : AppSession
             The AppSession object.
         ws : _BrowserWebSocketHandler
-            The websocket that owns this report.
+            The websocket corresponding to this session.
         """
         self.session = session
         self.ws = ws
-        self.report_run_count = 0
+        self.script_run_count = 0
 
     def __repr__(self) -> str:
         return util.repr_(self)
@@ -290,6 +292,15 @@ class Server:
     def script_path(self) -> str:
         return self._script_path
 
+    def get_app_page_names(self):
+        pages_dir = os.path.join(os.path.dirname(self.script_path), "pages")
+        return set(
+            [
+                page_desc["page_name"]
+                for page_desc in get_pages(pages_dir, self.script_path)
+            ]
+        )
+
     def get_session_by_id(self, session_id: str) -> Optional[AppSession]:
         """Return the AppSession corresponding to the given id, or None if
         no such session exists."""
@@ -412,7 +423,11 @@ class Server:
                     (
                         make_url_path_regex(base, "(.*)"),
                         StaticFileHandler,
-                        {"path": "%s/" % static_path, "default_filename": "index.html"},
+                        {
+                            "path": "%s/" % static_path,
+                            "default_filename": "index.html",
+                            "get_app_page_names": self.get_app_page_names,
+                        },
                     ),
                     (make_url_path_regex(base, trailing_slash=False), AddSlashHandler),
                 ]
@@ -590,7 +605,7 @@ Please report this bug at https://github.com/streamlit/streamlit/issues.
             populate_hash_if_needed(msg)
 
             if self._message_cache.has_message_reference(
-                msg, session_info.session, session_info.report_run_count
+                msg, session_info.session, session_info.script_run_count
             ):
                 # This session has probably cached this message. Send
                 # a reference instead.
@@ -602,24 +617,24 @@ Please report this bug at https://github.com/streamlit/streamlit/issues.
             # age.
             LOGGER.debug("Caching message (hash=%s)" % msg.hash)
             self._message_cache.add_message(
-                msg, session_info.session, session_info.report_run_count
+                msg, session_info.session, session_info.script_run_count
             )
 
         # If this was a `script_finished` message, we increment the
-        # report_run_count for this session, and update the cache
+        # script_run_count for this session, and update the cache
         if (
             msg.WhichOneof("type") == "script_finished"
             and msg.script_finished == ForwardMsg.FINISHED_SUCCESSFULLY
         ):
             LOGGER.debug(
-                "Report finished successfully; "
+                "Script run finished successfully; "
                 "removing expired entries from MessageCache "
                 "(max_age=%s)",
                 config.get_option("global.maxCachedMessageAge"),
             )
-            session_info.report_run_count += 1
+            session_info.script_run_count += 1
             self._message_cache.remove_expired_session_entries(
-                session_info.session, session_info.report_run_count
+                session_info.session, session_info.script_run_count
             )
 
         # Ship it off!
@@ -661,12 +676,27 @@ Please report this bug at https://github.com/streamlit/streamlit/issues.
         """
         session_data = SessionData(self._script_path, self._command_line)
         local_sources_watcher = LocalSourcesWatcher(session_data)
+
+        try:
+            token = ws.request.headers["X-Streamlit-User"]
+        except KeyError:
+            # token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJodHRwczovL3lvdXR1LmJlL3VLTE1ZWmxiSWI4In0.w9VNQR_eGxUE035675u6neMUNVBi3JCQ9jcJVTmEaEg"
+            token = None
+
+        if token:
+            payload = jwt.decode(token, options={"verify_signature": False})
+        else:
+            payload = dict()
+
+        user_info = util.get_user_info_from_payload(payload)
+
         session = AppSession(
             ioloop=self._ioloop,
             session_data=session_data,
             uploaded_file_manager=self._uploaded_file_mgr,
             message_enqueued_callback=self._enqueued_some_message,
             local_sources_watcher=local_sources_watcher,
+            user_info=user_info,
         )
 
         LOGGER.debug(

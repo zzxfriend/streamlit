@@ -1,4 +1,4 @@
-# Copyright 2018-2021 Streamlit Inc.
+# Copyright 2018-2022 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -178,6 +178,7 @@ class CommonCacheTest(DeltaGeneratorTestCase):
                 query_string="",
                 session_state=SessionState(),
                 uploaded_file_mgr=None,
+                page_name="",
             ),
         )
         with patch.object(call_stack, "_show_cached_st_function_warning") as warning:

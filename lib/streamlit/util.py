@@ -1,4 +1,4 @@
-# Copyright 2018-2021 Streamlit Inc.
+# Copyright 2018-2022 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -131,6 +131,12 @@ def index_(iterable, x) -> int:
 
 def lower_clean_dict_keys(dict):
     return {k.lower().strip(): v for k, v in dict.items()}
+
+
+def get_user_info_from_payload(user_dict):
+    email = user_dict.get("email")
+
+    return {"email": email}
 
 
 # TODO: Move this into errors.py? Replace with StreamlitAPIException?

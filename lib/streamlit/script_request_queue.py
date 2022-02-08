@@ -1,4 +1,4 @@
-# Copyright 2018-2021 Streamlit Inc.
+# Copyright 2018-2022 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ class RerunData:
 
     query_string: str = ""
     widget_states: Optional[WidgetStates] = None
+    page_name: str = ""
+    script_path: str = ""
 
 
 @attr.s(auto_attribs=True, slots=True)
@@ -94,6 +96,8 @@ class ScriptRequestQueue:
                             RerunData(
                                 query_string=data.query_string,
                                 widget_states=data.widget_states,
+                                page_name=data.page_name,
+                                script_path=data.script_path,
                             ),
                         )
                     elif data.widget_states is None:
@@ -114,6 +118,8 @@ class ScriptRequestQueue:
                             RerunData(
                                 query_string=data.query_string,
                                 widget_states=coalesced_states,
+                                page_name=data.page_name,
+                                script_path=data.script_path,
                             ),
                         )
                 else:

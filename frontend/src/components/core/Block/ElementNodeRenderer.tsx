@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2021 Streamlit Inc.
+ * Copyright 2018-2022 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,7 @@ interface ElementNodeRendererProps extends BaseBlockProps {
 const RawElementNodeRenderer = (
   props: ElementNodeRendererProps
 ): ReactElement => {
-  const { node } = props
+  const { node, connectionManager } = props
 
   if (!node) {
     throw new Error("ElementNode not found.")
@@ -212,7 +212,13 @@ const RawElementNodeRenderer = (
     }
 
     case "audio":
-      return <Audio width={width} element={node.element.audio as AudioProto} />
+      return (
+        <Audio
+          width={width}
+          element={node.element.audio as AudioProto}
+          connectionManager={connectionManager}
+        />
+      )
 
     case "balloons":
       return <Balloons scriptRunId={props.scriptRunId} />
@@ -358,7 +364,13 @@ const RawElementNodeRenderer = (
       )
 
     case "video":
-      return <Video width={width} element={node.element.video as VideoProto} />
+      return (
+        <Video
+          width={width}
+          element={node.element.video as VideoProto}
+          connectionManager={connectionManager}
+        />
+      )
 
     // Widgets
 
@@ -402,6 +414,7 @@ const RawElementNodeRenderer = (
           key={downloadButtonProto.id}
           element={downloadButtonProto}
           width={width}
+          connectionManager={connectionManager}
           {...widgetProps}
         />
       )

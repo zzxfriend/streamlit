@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2021 Streamlit Inc.
+ * Copyright 2018-2022 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import { ComponentRegistry } from "src/components/widgets/CustomComponent"
 import { sendS4AMessage } from "src/hocs/withS4ACommunication/withS4ACommunication"
 
 import PageLayoutContext from "src/components/core/PageLayoutContext"
+import { ConnectionManager } from "src/lib/ConnectionManager"
 import { BlockNode, AppRoot } from "src/lib/AppNode"
 
 import {
@@ -38,16 +39,14 @@ import {
 export interface AppViewProps {
   elements: AppRoot
 
-  // The unique ID for the most recent run of the report.
+  // The unique ID for the most recent script run.
   scriptRunId: string
 
   scriptRunState: ScriptRunState
 
   /**
    * If true, "stale" elements (that is, elements that were created during a previous
-   * run of a currently-running report) will be faded out.
-   *
-   * (When we're viewing a shared report, this is set to false.)
+   * run of a currently-running script) will be faded out.
    */
   showStaleElementIndicator: boolean
 
@@ -61,10 +60,12 @@ export interface AppViewProps {
   componentRegistry: ComponentRegistry
 
   formsData: FormsData
+
+  connectionManager: ConnectionManager | null
 }
 
 /**
- * Renders a Streamlit report. Reports consist of 0 or more elements.
+ * Renders a Streamlit app.
  */
 function AppView(props: AppViewProps): ReactElement {
   const {
@@ -77,6 +78,7 @@ function AppView(props: AppViewProps): ReactElement {
     uploadClient,
     componentRegistry,
     formsData,
+    connectionManager,
   } = props
 
   React.useEffect(() => {
@@ -108,6 +110,7 @@ function AppView(props: AppViewProps): ReactElement {
         uploadClient={uploadClient}
         componentRegistry={componentRegistry}
         formsData={formsData}
+        connectionManager={connectionManager}
       />
     </StyledAppViewBlockContainer>
   )

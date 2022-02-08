@@ -1,4 +1,4 @@
-# Copyright 2018-2021 Streamlit Inc.
+# Copyright 2018-2022 Streamlit Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from typing import cast
 import streamlit
 from streamlit.proto.Json_pb2 import Json as JsonProto
 from streamlit.state.session_state import LazySessionState
+from streamlit.user_info import LazyUserInfo
 
 
 class JsonMixin:
@@ -45,13 +46,13 @@ class JsonMixin:
         ... })
 
         .. output::
-           https://static.streamlit.io/0.25.0-2JkNY/index.html?id=CTFkMQd89hw3yZbZ4AUymS
-           height: 280px
+           https://share.streamlit.io/streamlit/docs/main/python/api-examples-source/data.json.py
+           height: 385px
 
         """
         import streamlit as st
 
-        if isinstance(body, LazySessionState):
+        if isinstance(body, (LazySessionState, LazyUserInfo)):
             body = body.to_dict()
 
         if not isinstance(body, str):

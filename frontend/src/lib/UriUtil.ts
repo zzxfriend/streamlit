@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2021 Streamlit Inc.
+ * Copyright 2018-2022 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 import { IS_DEV_ENV, WEBSOCKET_PORT_DEV } from "src/lib/baseconsts"
+import { ConnectionManager } from "src/lib/ConnectionManager"
 import DOMPurify from "dompurify"
 
 /**
@@ -110,9 +111,19 @@ export function xssSanitizeSvg(uri: string): string {
  * If this is a relative URI, assume it's being served from streamlit and
  * construct it appropriately.  Otherwise leave it alone.
  */
-export function buildMediaUri(uri: string): string {
+export function buildMediaUri(
+  uri: string,
+  connectionManager: ConnectionManager | null
+): string {
+  let baseUriParts: BaseUriParts | undefined
+  // TODO(vdonato): Update tests to also test for when connectionManager is
+  // defined.
+  if (connectionManager) {
+    baseUriParts = connectionManager.getBaseUriParts()
+  }
+
   return uri.startsWith("/media")
-    ? buildHttpUri(getWindowBaseUriParts(), uri)
+    ? buildHttpUri(baseUriParts || getWindowBaseUriParts(), uri)
     : uri
 }
 

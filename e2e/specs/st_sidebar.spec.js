@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018-2021 Streamlit Inc.
+ * Copyright 2018-2022 Streamlit Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ describe("st.sidebar", () => {
   it("does not collapse on text input on mobile", () => {
     cy.viewport(400, 800);
     // Expand the sidebar on mobile, with a manual click
-    cy.getIndexed("[data-testid='stSidebar'] button", 1).click();
+    cy.getIndexed("[data-testid='stSidebar'] button", 3).click();
 
     cy.get("[data-testid='stSidebar'] .stTextInput input").click();
 
