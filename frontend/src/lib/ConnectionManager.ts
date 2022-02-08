@@ -160,6 +160,8 @@ export class ConnectionManager {
     }
     baseUriPartsList.push(baseUriParts)
 
+    baseUriPartsList.reverse()
+
     return new WebsocketConnection({
       baseUriPartsList,
       onMessage: this.props.onMessage,
