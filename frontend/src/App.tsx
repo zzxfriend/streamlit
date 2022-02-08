@@ -926,6 +926,8 @@ export class App extends PureComponent<Props, State> {
       pageName = window.location.pathname.replace(`/${basePath}`, "")
     }
 
+    pageName = pageName.endsWith("/") ? pageName.slice(0, -1) : pageName
+
     this.setState({ currentPage: decodeURI(pageName) })
 
     this.sendBackMsg(
