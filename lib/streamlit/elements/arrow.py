@@ -539,93 +539,81 @@ class ArrowMixin:
                             if row + 1 <= new_df.shape[0]:
                                 row_selection_changes.append(Row(row, new_df.iloc[row]))
 
-                        if (
-                            previous_selection == "columns"
-                            and not column_selection_changes
-                        ):
-                            column_selection_cleared = True
-                        elif previous_selection == "rows" and not row_selection_changes:
-                            row_selection_cleared = True
-                        elif (
-                            previous_selection == "cells" and not cell_selection_changes
-                        ):
-                            cell_selection_cleared = True
+                    if previous_selection == "columns" and not column_selection_changes:
+                        column_selection_cleared = True
+                    elif previous_selection == "rows" and not row_selection_changes:
+                        row_selection_cleared = True
+                    elif previous_selection == "cells" and not cell_selection_changes:
+                        cell_selection_cleared = True
 
-                        # TODO: Support cleanup
-                        for selection_callback in on_selection_change:
-                            fire_event = False
-                            kwargs_callback = {}
-                            # Also use type for selection, via: get_type_hints
-                            arguments = inspect.getfullargspec(selection_callback).args
-                            if "cell" in arguments:
-                                if cell_selection_changes:
-                                    kwargs_callback["cell"] = cell_selection_changes[0]
-                                    fire_event = True
-                                else:
-                                    kwargs_callback["cell"] = None
-                                if cell_selection_cleared:
-                                    fire_event = True
+                    # TODO: Support cleanup
+                    for selection_callback in on_selection_change:
+                        fire_event = False
+                        kwargs_callback = {}
+                        # Also use type for selection, via: get_type_hints
+                        arguments = inspect.getfullargspec(selection_callback).args
+                        if "cell" in arguments:
+                            if cell_selection_changes:
+                                kwargs_callback["cell"] = cell_selection_changes[0]
+                                fire_event = True
+                            else:
+                                kwargs_callback["cell"] = None
+                            if cell_selection_cleared:
+                                fire_event = True
 
-                            if "cells" in arguments:
-                                if cell_selection_changes:
-                                    kwargs_callback["cells"] = cell_selection_changes
-                                    fire_event = True
-                                else:
-                                    kwargs_callback["cells"] = []
+                        if "cells" in arguments:
+                            if cell_selection_changes:
+                                kwargs_callback["cells"] = cell_selection_changes
+                                fire_event = True
+                            else:
+                                kwargs_callback["cells"] = []
 
-                                if cell_selection_cleared:
-                                    fire_event = True
+                            if cell_selection_cleared:
+                                fire_event = True
 
-                            if "row" in arguments:
-                                if row_selection_changes:
-                                    kwargs_callback["row"] = row_selection_changes[0]
-                                    fire_event = True
-                                else:
-                                    kwargs_callback["row"] = None
+                        if "row" in arguments:
+                            if row_selection_changes:
+                                kwargs_callback["row"] = row_selection_changes[0]
+                                fire_event = True
+                            else:
+                                kwargs_callback["row"] = None
 
-                                if row_selection_cleared:
-                                    fire_event = True
+                            if row_selection_cleared:
+                                fire_event = True
 
-                            if "rows" in arguments:
-                                if row_selection_changes:
-                                    kwargs_callback["rows"] = row_selection_changes
-                                    fire_event = True
-                                else:
-                                    kwargs_callback["rows"] = []
+                        if "rows" in arguments:
+                            if row_selection_changes:
+                                kwargs_callback["rows"] = row_selection_changes
+                                fire_event = True
+                            else:
+                                kwargs_callback["rows"] = []
 
-                                if row_selection_cleared:
-                                    fire_event = True
+                            if row_selection_cleared:
+                                fire_event = True
 
-                            if "column" in arguments:
-                                if column_selection_changes:
-                                    kwargs_callback[
-                                        "column"
-                                    ] = column_selection_changes[0]
-                                    fire_event = True
-                                else:
-                                    kwargs_callback["column"] = None
+                        if "column" in arguments:
+                            if column_selection_changes:
+                                kwargs_callback["column"] = column_selection_changes[0]
+                                fire_event = True
+                            else:
+                                kwargs_callback["column"] = None
 
-                                if column_selection_cleared:
-                                    fire_event = True
+                            if column_selection_cleared:
+                                fire_event = True
 
-                            if "columns" in arguments:
-                                if column_selection_changes:
-                                    kwargs_callback[
-                                        "columns"
-                                    ] = column_selection_changes
-                                    fire_event = True
-                                else:
-                                    kwargs_callback["columns"] = []
+                        if "columns" in arguments:
+                            if column_selection_changes:
+                                kwargs_callback["columns"] = column_selection_changes
+                                fire_event = True
+                            else:
+                                kwargs_callback["columns"] = []
 
-                                if column_selection_cleared:
-                                    fire_event = True
+                            if column_selection_cleared:
+                                fire_event = True
 
-                            if callable(selection_callback) and fire_event:
-                                print(kwargs_callback)
-                                # TOOD: show error if not a callable
-                                selection_callback(
-                                    *args, **{**kwargs, **kwargs_callback}
-                                )
+                        if callable(selection_callback) and fire_event:
+                            # TOOD: show error if not a callable
+                            selection_callback(*args, **{**kwargs, **kwargs_callback})
 
         if is_list_input:
             # TODO: Smarter handling
