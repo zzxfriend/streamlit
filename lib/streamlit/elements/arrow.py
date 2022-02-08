@@ -16,7 +16,7 @@ import inspect
 import json
 from collections import namedtuple
 from collections.abc import Iterable
-from typing import Any, Callable, Dict, List, Optional, Union, cast, get_type_hints
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 import pyarrow as pa
 from numpy import ndarray
@@ -24,10 +24,7 @@ from pandas import DataFrame
 from pandas.io.formats.style import Styler
 from streamlit.proto.Arrow_pb2 import Arrow as ArrowProto
 from streamlit.proto.DataEditor_pb2 import DataEditor as DataEditorProto
-from streamlit.proto.InteractiveDataframe_pb2 import (
-    InteractiveDataframe as InteractiveDataframeProto,
-)
-from streamlit.script_run_context import ScriptRunContext, get_script_run_ctx
+from streamlit.script_run_context import get_script_run_ctx
 from streamlit.state.session_state import (
     WidgetArgs,
     WidgetCallback,
@@ -177,13 +174,21 @@ class ArrowMixin:
         width: Optional[int] = None,
         height: Optional[int] = None,
         key: Optional[Key] = None,
+        # New parameters:
         on_click: Optional[Union[WidgetCallback, bool]] = None,
         on_select: Optional[Union[WidgetCallback, bool]] = None,
         args: Optional[WidgetArgs] = None,
         kwargs: Optional[WidgetKwargs] = None,
+        columns: Optional[Dict[Union[int, str], dict]] = None,
     ) -> "streamlit.delta_generator.DeltaGenerator":
         if on_click is None and on_select is None:
             return self._arrow_dataframe(data, width, height)
+
+        args = args or ()
+        kwargs = kwargs or {}
+
+        if columns is None:
+            columns = {}
 
         # If pandas.Styler uuid is not provided, a hash of the position
         # of the element will be used. This will cause a rerender of the table
@@ -195,7 +200,7 @@ class ArrowMixin:
         data_editor_proto.disabled = False
         data_editor_proto.editable = False
         data_editor_proto.form_id = current_form_id(self.dg)
-        data_editor_proto.columns = "{}"
+        data_editor_proto.columns = json.dumps(columns)
         data_editor_proto.column_selection_mode = (
             DataEditorProto.SelectionMode.DEACTIVATED
         )
@@ -259,37 +264,44 @@ class ArrowMixin:
                 old_selections = old_state["selections"]
 
             if new_selections is not None and new_selections != old_selections:
-                if not isinstance(data, DataFrame):
-                    data = type_util.convert_anything_to_df(data)
+                if len(new_selections) == 0:
+                    # Selection is cleared (e.g. via escape)
+                    if to_key(key) is not None:
+                        session_state[to_key(key)] = Cell(None, None, None)
 
-                # changes in selection
-                for selection in new_selections:
-                    col, row = selection.split(":")
-                    if not col or not row:
-                        # Not a cell selection
-                        continue
-                    col, row = int(col), int(row)
+                    if callable(on_select):
+                        # We only need to care about select here, click is only fired if a cell is actually clicked
+                        on_select(*args, **kwargs)
 
-                    if col is not None and row is not None:
-                        if row + 1 <= data.shape[0] and col + 1 <= data.shape[1]:
-                            value = data.iloc[row, col]
-                            if hasattr(value, "item"):
-                                value = value.item()
+                else:
+                    if not isinstance(data, DataFrame):
+                        data = type_util.convert_anything_to_df(data)
 
-                            if to_key(key) is not None:
-                                session_state[to_key(key)] = Cell(row, col, value)
+                    # changes in selection
+                    for selection in new_selections:
+                        col, row = selection.split(":")
+                        if not col or not row:
+                            # Not a cell selection
+                            continue
+                        col, row = int(col), int(row)
 
-                            args = args or ()
-                            kwargs = kwargs or {}
+                        if col is not None and row is not None:
+                            if row + 1 <= data.shape[0] and col + 1 <= data.shape[1]:
+                                value = data.iloc[row, col]
+                                if hasattr(value, "item"):
+                                    value = value.item()
 
-                            if callable(on_click):
-                                on_click(*args, **kwargs)
+                                if to_key(key) is not None:
+                                    session_state[to_key(key)] = Cell(row, col, value)
 
-                            if callable(on_select):
-                                on_select(*args, **kwargs)
+                                if callable(on_click):
+                                    on_click(*args, **kwargs)
 
-                            # TODO: only trigger on the first selection
-                            break
+                                if callable(on_select):
+                                    on_select(*args, **kwargs)
+
+                                # TODO: only trigger on the first selection
+                                break
 
         return cast(
             "streamlit.delta_generator.DeltaGenerator",
@@ -318,6 +330,9 @@ class ArrowMixin:
 
         if columns is None:
             columns = {}
+
+        args = args or ()
+        kwargs = kwargs or {}
 
         if on_selection_change is None:
             on_selection_change = []
@@ -477,6 +492,20 @@ class ArrowMixin:
                     row_selection_changes = []
                     cell_selection_changes = []
 
+                    cell_selection_cleared = False
+                    row_selection_cleared = False
+                    column_selection_cleared = False
+
+                    previous_selection = None
+                    # Determine selection
+                    if old_selections:
+                        for selection in old_selections:
+                            if selection.endswith(":"):
+                                previous_selection = "columns"
+                            elif selection.startswith(":"):
+                                previous_selection = "rows"
+                            else:
+                                previous_selection = "cells"
                     # changes in selection
                     for selection in new_selections:
                         col, row = selection.split(":")
@@ -509,6 +538,88 @@ class ArrowMixin:
                         elif row is not None:
                             if row + 1 <= new_df.shape[0]:
                                 row_selection_changes.append(Row(row, new_df.iloc[row]))
+
+                        if (
+                            previous_selection == "columns"
+                            and not column_selection_changes
+                        ):
+                            column_selection_cleared = True
+                        elif previous_selection == "rows" and not row_selection_changes:
+                            row_selection_cleared = True
+                        elif (
+                            previous_selection == "cells" and not cell_selection_changes
+                        ):
+                            cell_selection_cleared = True
+
+                        # TODO: Support cleanup
+                        for selection_callback in on_selection_change:
+                            fire_event = False
+                            kwargs_callback = {}
+                            # Also use type for selection, via: get_type_hints
+                            arguments = inspect.getfullargspec(selection_callback).args
+                            if "cell" in arguments:
+                                if cell_selection_changes:
+                                    kwargs_callback["cell"] = cell_selection_changes[0]
+                                    fire_event = True
+                                else:
+                                    kwargs_callback["cell"] = None
+                                if cell_selection_cleared:
+                                    fire_event = True
+
+                            if "cells" in arguments:
+                                if cell_selection_changes:
+                                    kwargs_callback["cells"] = cell_selection_changes
+                                elif cell_selection_cleared:
+                                    kwargs_callback["cells"] = []
+
+                            if "row" in arguments:
+                                if row_selection_changes:
+                                    kwargs_callback["row"] = row_selection_changes[0]
+                                    fire_event = True
+                                else:
+                                    kwargs_callback["row"] = None
+
+                                if row_selection_cleared:
+                                    fire_event = True
+
+                            if "rows" in arguments:
+                                if row_selection_changes:
+                                    kwargs_callback["rows"] = row_selection_changes
+                                else:
+                                    kwargs_callback["rows"] = []
+
+                                if row_selection_cleared:
+                                    fire_event = True
+
+                            if "column" in arguments:
+                                if column_selection_changes:
+                                    kwargs_callback[
+                                        "column"
+                                    ] = column_selection_changes[0]
+
+                                else:
+                                    kwargs_callback["column"] = None
+
+                                if column_selection_cleared:
+                                    fire_event = True
+
+                            if "columns" in arguments:
+                                if column_selection_changes:
+                                    kwargs_callback[
+                                        "columns"
+                                    ] = column_selection_changes
+                                else:
+                                    kwargs_callback["columns"] = []
+
+                                if column_selection_cleared:
+                                    fire_event = True
+
+                            if callable(selection_callback) and fire_event:
+                                print(kwargs_callback)
+                                # TOOD: show error if not a callable
+                                selection_callback(
+                                    *args, **{**kwargs, **kwargs_callback}
+                                )
 
         if is_list_input:
             # TODO: Smarter handling
