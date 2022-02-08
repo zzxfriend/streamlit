@@ -14,10 +14,9 @@
 
 import os
 import sys
-import urllib
 import uuid
 from enum import Enum
-from typing import TYPE_CHECKING, Callable, Optional, List, Any, cast
+from typing import TYPE_CHECKING, Callable, Optional, List, Any, cast, Dict
 from urllib.parse import unquote
 from streamlit.uploaded_file_manager import UploadedFileManager
 
