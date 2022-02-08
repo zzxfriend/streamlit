@@ -126,19 +126,12 @@ class ArrowMixin:
         data: Data = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        key: Optional[Key] = None,
-        on_click: Optional[WidgetCallback] = None,
-        args: Optional[WidgetArgs] = None,
-        kwargs: Optional[WidgetKwargs] = None,
-        disabled: bool = False,
     ) -> "streamlit.delta_generator.DeltaGenerator":
         """Display a dataframe as an interactive table.
-
         Parameters
         ----------
         data : pandas.DataFrame, pandas.Styler, pyarrow.Table, numpy.ndarray, Iterable, dict, or None
             The data to display.
-
             If 'data' is a pandas.Styler, it will be used to style its
             underyling DataFrame.
         width : int or None
@@ -147,7 +140,6 @@ class ArrowMixin:
         height : int or None
             Desired height of the UI element expressed in pixels. If None, a
             default height is used.
-
         Examples
         --------
         >>> df = pd.DataFrame(
@@ -155,59 +147,27 @@ class ArrowMixin:
         ...    columns=('col %d' % i for i in range(20)))
         ...
         >>> st._arrow_dataframe(df)
-
         >>> st._arrow_dataframe(df, 200, 100)
-
         You can also pass a Pandas Styler object to change the style of
         the rendered DataFrame:
-
         >>> df = pd.DataFrame(
         ...    np.random.randn(10, 20),
         ...    columns=('col %d' % i for i in range(20)))
         ...
         >>> st._arrow_dataframe(df.style.highlight_max(axis=0))
-
         """
         # If pandas.Styler uuid is not provided, a hash of the position
         # of the element will be used. This will cause a rerender of the table
         # when the position of the element is changed.
-
         delta_path = self.dg._get_delta_path_str()
         default_uuid = str(hash(delta_path))
 
-        dataframe_proto = InteractiveDataframeProto()
-        dataframe_proto.disabled = disabled
-        dataframe_proto.form_id = current_form_id(self.dg)
-        marshall(dataframe_proto, data, default_uuid)
-
-        def deserialize_dataframe_event(ui_value, widget_id=""):
-            return ui_value if ui_value is not None else {}
-
-        def serialize_dataframe_event(v):
-            return json.dumps(v)
-
-        # get_session_state()
-
-        current_value, _ = register_widget(
-            "arrow_data_frame",
-            dataframe_proto,
-            user_key=to_key(key),
-            on_change_handler=on_click,
-            args=args,
-            kwargs=kwargs,
-            deserializer=deserialize_dataframe_event,
-            serializer=serialize_dataframe_event,
-            ctx=get_script_run_ctx(),
-        )
-
-        # NoValue
+        proto = ArrowProto()
+        marshall(proto, data, default_uuid)
         return cast(
             "streamlit.delta_generator.DeltaGenerator",
             self.dg._enqueue(
-                "arrow_data_frame",
-                dataframe_proto,
-                element_width=width,
-                element_height=height,
+                "arrow_data_frame", proto, element_width=width, element_height=height
             ),
         )
 

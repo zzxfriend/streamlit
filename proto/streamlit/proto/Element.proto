@@ -20,7 +20,6 @@ import "streamlit/proto/Alert.proto";
 import "streamlit/proto/Arrow.proto";
 import "streamlit/proto/Audio.proto";
 import "streamlit/proto/Balloons.proto";
-import "streamlit/proto/InteractiveDataframe.proto";
 import "streamlit/proto/ArrowVegaLiteChart.proto";
 import "streamlit/proto/BokehChart.proto";
 import "streamlit/proto/Button.proto";
@@ -65,7 +64,7 @@ message Element {
   // An element can be one of the following element types.
   oneof type {
     Alert alert = 30;
-    InteractiveDataframe arrow_data_frame = 40;
+    Arrow arrow_data_frame = 40;
     Arrow arrow_table = 39;
     ArrowVegaLiteChart arrow_vega_lite_chart = 41;
     Audio audio = 13;

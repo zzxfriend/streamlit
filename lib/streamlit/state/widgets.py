@@ -26,7 +26,6 @@ from streamlit.proto.DataEditor_pb2 import DataEditor
 from streamlit.proto.DateInput_pb2 import DateInput
 from streamlit.proto.DownloadButton_pb2 import DownloadButton
 from streamlit.proto.FileUploader_pb2 import FileUploader
-from streamlit.proto.InteractiveDataframe_pb2 import InteractiveDataframe
 from streamlit.proto.MultiSelect_pb2 import MultiSelect
 from streamlit.proto.NumberInput_pb2 import NumberInput
 from streamlit.proto.Radio_pb2 import Radio
@@ -65,7 +64,6 @@ WidgetProto = Union[
     TextArea,
     TextInput,
     TimeInput,
-    InteractiveDataframe,
     DataEditor,
 ]
 
@@ -199,7 +197,6 @@ element_type_to_value_type = {
     "text_area": "string_value",
     "text_input": "string_value",
     "time_input": "string_value",
-    "arrow_data_frame": "json_value",
     "data_editor": "json_value",
     "component_instance": "json_value",
 }

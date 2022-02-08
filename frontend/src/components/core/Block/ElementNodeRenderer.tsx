@@ -223,7 +223,6 @@ const RawElementNodeRenderer = (
           element={node.quiverElement as Quiver}
           width={width}
           height={height}
-          {...widgetProps}
         />
       )
 

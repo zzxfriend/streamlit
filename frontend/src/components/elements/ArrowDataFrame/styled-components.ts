@@ -68,15 +68,8 @@ const StyledDataFrameCell = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-start",
-  "&:hover": {
-    backgroundColor: theme.colors.fadedText10,
-    cursor: "pointer",
-  },
-  "&:active": {
-    backgroundColor: theme.colors.secondaryBg,
-    cursor: "pointer",
-  },
-  "&:focus-visible, &:focus": {
+
+  "&focus-visible, &:focus": {
     outline: "none",
   },
 }))
@@ -105,8 +98,8 @@ export const StyledDataFrameCornerCell = styled(
 export const StyledDataFrameColHeaderCell = styled(StyledDataFrameCell)(
   ({ theme }) => ({
     /* Row headers are click-to-sort, so we make the text unselectable.
-     Column headers are also unselectable, so that clicking to sort the
-     column's row header doesn't result in the entire column being selected */
+      Column headers are also unselectable, so that clicking to sort the
+      column's row header doesn't result in the entire column being selected */
     userSelect: "none",
     ...headerCellFormatter(theme),
     ...cellTextFormatter(theme),
@@ -116,8 +109,8 @@ export const StyledDataFrameColHeaderCell = styled(StyledDataFrameCell)(
 export const StyledDataFrameRowHeaderCell = styled(StyledDataFrameCell)(
   ({ theme }) => ({
     /* Row headers are click-to-sort, so we make the text unselectable.
-     Column headers are also unselectable, so that clicking to sort the
-     column's row header doesn't result in the entire column being selected */
+      Column headers are also unselectable, so that clicking to sort the
+      column's row header doesn't result in the entire column being selected */
     userSelect: "none",
     ...headerCellFormatter(theme),
     ...cellTextFormatter(theme),
