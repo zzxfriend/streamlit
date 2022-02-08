@@ -39,7 +39,6 @@ from streamlit.proto.NewSession_pb2 import (
     UserInfo,
 )
 from streamlit.session_data import SessionData
-from streamlit.session_data import generate_new_id
 from streamlit.script_request_queue import RerunData, ScriptRequest, ScriptRequestQueue
 from streamlit.script_runner import ScriptRunner, ScriptRunnerEvent
 from streamlit.source_util import get_pages, page_name
@@ -54,6 +53,11 @@ class AppSessionState(Enum):
     APP_NOT_RUNNING = "APP_NOT_RUNNING"
     APP_IS_RUNNING = "APP_IS_RUNNING"
     SHUTDOWN_REQUESTED = "SHUTDOWN_REQUESTED"
+
+
+def _generate_scriptrun_id() -> str:
+    """Randomly generate a unique ID for a script execution."""
+    return str(uuid.uuid4())
 
 
 class AppSession:
@@ -405,12 +409,9 @@ class AppSession:
         self.enqueue(msg)
 
     def _enqueue_new_session_message(self) -> None:
-        new_id = generate_new_id()
-        self._session_data.script_run_id = new_id
-
         msg = ForwardMsg()
 
-        msg.new_session.script_run_id = self._session_data.script_run_id
+        msg.new_session.script_run_id = _generate_scriptrun_id()
         msg.new_session.name = self._session_data.name
         msg.new_session.script_path = self._session_data.script_path
 
