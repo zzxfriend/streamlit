@@ -569,8 +569,12 @@ class ArrowMixin:
                             if "cells" in arguments:
                                 if cell_selection_changes:
                                     kwargs_callback["cells"] = cell_selection_changes
-                                elif cell_selection_cleared:
+                                    fire_event = True
+                                else:
                                     kwargs_callback["cells"] = []
+
+                                if cell_selection_cleared:
+                                    fire_event = True
 
                             if "row" in arguments:
                                 if row_selection_changes:
@@ -585,6 +589,7 @@ class ArrowMixin:
                             if "rows" in arguments:
                                 if row_selection_changes:
                                     kwargs_callback["rows"] = row_selection_changes
+                                    fire_event = True
                                 else:
                                     kwargs_callback["rows"] = []
 
@@ -596,7 +601,7 @@ class ArrowMixin:
                                     kwargs_callback[
                                         "column"
                                     ] = column_selection_changes[0]
-
+                                    fire_event = True
                                 else:
                                     kwargs_callback["column"] = None
 
@@ -608,6 +613,7 @@ class ArrowMixin:
                                     kwargs_callback[
                                         "columns"
                                     ] = column_selection_changes
+                                    fire_event = True
                                 else:
                                     kwargs_callback["columns"] = []
 
@@ -682,7 +688,7 @@ class ArrowMixin:
 
 
 def marshall(
-    proto: Union[ArrowProto, InteractiveDataframeProto, DataEditorProto],
+    proto: Union[ArrowProto, DataEditorProto],
     data: Data,
     default_uuid: Optional[str] = None,
 ) -> None:
