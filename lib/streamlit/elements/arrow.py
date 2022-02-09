@@ -181,7 +181,7 @@ class ArrowMixin:
         kwargs: Optional[WidgetKwargs] = None,
         columns: Optional[Dict[Union[int, str], dict]] = None,
     ) -> "streamlit.delta_generator.DeltaGenerator":
-        if on_click is None and on_select is None:
+        if on_click is None and on_select is None and columns is None:
             return self._arrow_dataframe(data, width, height)
 
         args = args or ()
@@ -215,11 +215,11 @@ class ArrowMixin:
         marshall(data_editor_proto, data, default_uuid)
 
         session_state = get_session_state()
-        if to_key(key) not in session_state:
+        if key and to_key(key) not in session_state:
             # The sessions state of this should alway be initalized
             session_state[to_key(key)] = Cell(None, None, None)
 
-        if on_click and not on_select:
+        if on_click and not on_select and key:
             # On click events should only be removed from session state for next reload
             session_state[to_key(key)] = Cell(None, None, None)
 
@@ -280,7 +280,7 @@ class ArrowMixin:
                     # changes in selection
                     for selection in new_selections:
                         col, row = selection.split(":")
-                        if not col or not row:
+                        if col is None or col == "" or row is None or row == "":
                             # Not a cell selection
                             continue
                         col, row = int(col), int(row)

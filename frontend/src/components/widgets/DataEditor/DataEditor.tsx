@@ -712,7 +712,7 @@ export function DataEditor({
           trailingRowOptions={
             (element.widget as DataEditorProto).editable === true
               ? {
-                  hint: "New row",
+                  hint: "New",
                   sticky: true,
                   tint: true,
                 }
