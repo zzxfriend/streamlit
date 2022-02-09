@@ -174,14 +174,45 @@ class ArrowMixin:
         width: Optional[int] = None,
         height: Optional[int] = None,
         key: Optional[Key] = None,
-        # New parameters:
         on_click: Optional[Union[WidgetCallback, bool]] = None,
         on_select: Optional[Union[WidgetCallback, bool]] = None,
         args: Optional[WidgetArgs] = None,
         kwargs: Optional[WidgetKwargs] = None,
         columns: Optional[Dict[Union[int, str], dict]] = None,
     ) -> "streamlit.delta_generator.DeltaGenerator":
-        if on_click is None and on_select is None and columns is None:
+        """Display a dataframe as an interactive table.
+
+        Parameters
+        ----------
+        data : pandas.DataFrame, pandas.Styler, pyarrow.Table, numpy.ndarray, Iterable, dict, or None
+            The data to display.
+            If 'data' is a pandas.Styler, it will be used to style its
+            underyling DataFrame.
+        width : int or None
+            Desired width of the UI element expressed in pixels. If None, a
+            default width based on the page width is used.
+        height : int or None
+            Desired height of the UI element expressed in pixels. If None, a
+            default height is used.
+        key : str or int
+            An optional string or integer to use as the unique key for the widget.
+            If this is omitted, a key will be generated for the widget
+            based on its content. Multiple widgets of the same type may
+            not share the same key.
+        on_click: callable or bool
+            An optional callback invoked when the user clicks on a cell. The state is cleared after rerun.
+            The click event can also be activated by passing `True` as the value. Thereby, the value is only accesible from the state.
+            The click event (stored in the sessions state) is a `NamedTuple` containing the following fields: `row`, `column`, and `value`.
+        on_select: callable or bool
+             An optional callback invoked when the user selects a cell. The selection is persisted in the session state.
+             The cell selection can also be activated by passing `True` as the value. Thereby, the value is only accesible from the state.
+             The selection event (stored in the sessions state) is a `NamedTuple` containing the following fields: `row`, `column`, and `value`.
+        args : tuple
+            An optional tuple of args to pass to the callback.
+        kwargs : dict
+            An optional dict of kwargs to pass to the callback.
+        """
+        if on_click is None and on_select is None and columns is None and key is None:
             return self._arrow_dataframe(data, width, height)
 
         args = args or ()
@@ -217,11 +248,11 @@ class ArrowMixin:
         session_state = get_session_state()
         if key and to_key(key) not in session_state:
             # The sessions state of this should alway be initalized
-            session_state[to_key(key)] = Cell(None, None, None)
+            session_state[to_key(key)] = None
 
         if on_click and not on_select and key:
             # On click events should only be removed from session state for next reload
-            session_state[to_key(key)] = Cell(None, None, None)
+            session_state[to_key(key)] = None
 
         old_state = None
         widget_id = _get_widget_id(
@@ -267,7 +298,7 @@ class ArrowMixin:
                 if len(new_selections) == 0:
                     # Selection is cleared (e.g. via escape)
                     if to_key(key) is not None:
-                        session_state[to_key(key)] = Cell(None, None, None)
+                        session_state[to_key(key)] = None
 
                     if callable(on_select):
                         # We only need to care about select here, click is only fired if a cell is actually clicked
@@ -327,7 +358,47 @@ class ArrowMixin:
         columns: Optional[Dict[Union[int, str], dict]] = None,
         editable: bool = True,
     ) -> Data:
+        """Display an editable table input widget.
 
+        Parameters
+        ----------
+        data : pandas.DataFrame, pandas.Styler, pyarrow.Table, numpy.ndarray, Iterable, dict, or None
+            The data to display.
+            If 'data' is a pandas.Styler, it will be used to style its
+            underyling DataFrame.
+        width : int or None
+            Desired width of the UI element expressed in pixels. If None, a
+            default width based on the page width is used.
+        height : int or None
+            Desired height of the UI element expressed in pixels. If None, a
+            default height is used.
+        key : str or int
+            An optional string or integer to use as the unique key for the widget.
+            If this is omitted, a key will be generated for the widget
+            based on its content. Multiple widgets of the same type may
+            not share the same key.
+        on_selection_change: callable or list
+            An optional callback or list of callbacks to invoke when the user selects rows, columns or cells.
+            The callback is required to have any of the following parameters: `cell`, `row`, `column`, `rows`, `columns`.
+            When you provide a callback for columns, rows, or cells, the respective selection capabilities is activated.
+            The value of the selection is passed to the respective callback parameter.
+            If a selection is cleared, `None` or empty list is passed to the paramter
+        columns: dict
+            Allows to configure the table columns of the frontend components.
+            It is a mapping of column names or indexes to a dict that contains configuration options.
+            The following configuration options are supported: `title` (change column title), `width` (set column width), `editable` (set column as editable), `type` (set column data type).
+        editable: bool
+            Determines if the table is editable or read-only.
+        args : tuple
+            An optional tuple of args to pass to the callback.
+        kwargs : dict
+            An optional dict of kwargs to pass to the callback.
+
+        Returns
+        -------
+        pandas.DataFrame or list
+            The edited data structure.
+        """
         if columns is None:
             columns = {}
 

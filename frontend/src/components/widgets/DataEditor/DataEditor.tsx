@@ -696,7 +696,7 @@ export function DataEditor({
           maxColumnWidth={1000}
           verticalBorder={true} // border between cells
           smoothScrollX={true} // false?
-          smoothScrollY={true} // false?
+          smoothScrollY={numRows < 100000}
           // Activate search:
           showSearch={showSearch}
           onSearchClose={() => setShowSearch(false)}
@@ -834,9 +834,7 @@ export function DataEditor({
               )
             }
           }}
-          onCellClicked={(cell: readonly [number, number]) => {
-            //console.log(cell)
-          }}
+          onCellClicked={(cell: readonly [number, number]) => {}}
           onCellEdited={(
             [col, row]: readonly [number, number],
             val: GridCell
