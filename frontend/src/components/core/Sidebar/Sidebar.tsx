@@ -44,6 +44,8 @@ interface State {
   lastInnerWidth: number
 }
 
+const testTypechecking = (): boolean => "notBool"
+
 class Sidebar extends PureComponent<SidebarProps, State> {
   private mediumBreakpointPx: number
 
@@ -55,6 +57,8 @@ class Sidebar extends PureComponent<SidebarProps, State> {
   private sidebarRef = React.createRef<HTMLDivElement>()
 
   constructor(props: SidebarProps) {
+    testTypechecking()
+
     super(props)
     this.mediumBreakpointPx = Sidebar.calculateMaxBreakpoint(
       props.theme.breakpoints.md
