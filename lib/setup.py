@@ -34,8 +34,6 @@ except:
     )
     sys.exit(exit_msg)
 
-VERSION = "2.2.2"  # PEP-440
-
 NAME = "streamlit"
 
 DESCRIPTION = "The fastest way to build data apps in Python"
@@ -71,7 +69,6 @@ class VerifyVersionCommand(install):
 
 setuptools.setup(
     name=NAME,
-    version=VERSION,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     url="https://streamlit.io",
