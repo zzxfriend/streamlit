@@ -769,7 +769,7 @@ jobs:
             aws s3 cp ${WHEELFILE} s3://core-previews/${PREVIEW_BRANCH}/ --acl public-read
             cd ../..
 
-            echo -e "https://core-previews.s3-us-west-2.amazonaws.com/${PREVIEW_BRANCH}/${WHEELFILE}"
+            echo -e "Here is the link to download the wheel file: https://core-previews.s3-us-west-2.amazonaws.com/${PREVIEW_BRANCH}/${WHEELFILE}"
             echo -e "https://core-previews.s3-us-west-2.amazonaws.com/${PREVIEW_BRANCH}/${WHEELFILE}" >> S3_URL
 
       - run:
@@ -786,7 +786,7 @@ jobs:
             aws s3 cp ${WHEELFILE} s3://core-previews/${PREVIEW_BRANCH}/ --acl public-read
             cd ../..
 
-            echo -e "https://core-previews.s3-us-west-2.amazonaws.com/${PREVIEW_BRANCH}/${WHEELFILE}"
+            echo -e "Here is the link to download the wheel file: https://core-previews.s3-us-west-2.amazonaws.com/${PREVIEW_BRANCH}/${WHEELFILE}"
             echo -e "https://core-previews.s3-us-west-2.amazonaws.com/${PREVIEW_BRANCH}/${WHEELFILE}" >> S3_URL
 
       - run:
