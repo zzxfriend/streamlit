@@ -773,9 +773,9 @@ jobs:
             echo -e "https://core-previews.s3-us-west-2.amazonaws.com/${PREVIEW_BRANCH}/${WHEELFILE}" >> S3_URL
 
       - run:
-        name: Upload wheel for Metrics App!
+          name: Upload wheel for Metrics App!
           command: |
-             ${SUDO} apt-get install -y awscli
+            ${SUDO} apt-get install -y awscli
             aws configure set aws_access_key_id ${CORE_PREVIEWS_S3_KEY_ID}
             aws configure set aws_secret_access_key ${CORE_PREVIEWS_S3_SECRET_KEY}
 
