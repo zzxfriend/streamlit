@@ -34,7 +34,7 @@ except:
     )
     sys.exit(exit_msg)
 
-VERSION = "2.2.2"  # PEP-440
+VERSION = "1.9.0"  # PEP-440
 
 NAME = "streamlit"
 
@@ -60,13 +60,12 @@ class VerifyVersionCommand(install):
 
     def run(self):
         tag = os.getenv("CIRCLE_TAG")
-        print(tag)
 
-        # if tag != VERSION:
-        #     info = "Git tag: {0} does not match the version of this app: {1}".format(
-        #         tag, VERSION
-        #     )
-        #     sys.exit(info)
+        if tag != VERSION:
+            info = "Git tag: {0} does not match the version of this app: {1}".format(
+                tag, VERSION
+            )
+            sys.exit(info)
 
 
 setuptools.setup(
