@@ -29,8 +29,13 @@ CONDA_REPO_DIR = os.path.join(ROOT_DIR, "conda_repo")
 # json string.
 UDF_JSON_FILENAME = "PYTHON_UDF_X86_PRPR_TOP_LEVEL_PACKAGES_FROZEN_SOLVE_VERSIONS.json"
 
+# The architecture to build for, or "None" to build for the local architecture.
+CONDA_SUBDIR = "linux-aarch64"
+
 
 def main() -> None:
+    print(f"Building conda repo for {CONDA_SUBDIR}")
+
     # Populate our local cache. (This unfortunately means we're having
     # conda solve the environment twice, once to pre-warm the cache,
     # and then immediately again to generate the package list.
@@ -49,6 +54,17 @@ def main() -> None:
         f.write(udf_json_string)
 
     print(f"\nconda repo successfully built at {CONDA_REPO_DIR}!")
+
+
+def get_conda_subprocess_env() -> Dict[str, str]:
+    """Return an 'env' dict for running conda commands via the subprocess
+    module. We set the $CONDA_SUBDIR environment variable to the architecture
+    we want to build a repo for.
+    """
+    env = os.environ.copy()
+    if CONDA_SUBDIR is not None:
+        env["CONDA_SUBDIR"] = CONDA_SUBDIR
+    return env
 
 
 def download_packages_to_cache() -> None:
@@ -71,13 +87,16 @@ def download_packages_to_cache() -> None:
         # Download the repo's packages, but don't create the repo.
         "--download-only",
     ] + BASE_PACKAGES
-    subprocess.run(command, check=True)
+    subprocess.run(command, check=True, env=get_conda_subprocess_env())
 
 
 def get_conda_cache_dirs() -> List[str]:
     """Return a list of all conda cache directories."""
     result = subprocess.run(
-        ["conda", "info", "--json"], check=True, stdout=subprocess.PIPE
+        ["conda", "info", "--json"],
+        check=True,
+        stdout=subprocess.PIPE,
+        env=get_conda_subprocess_env(),
     )
     conda_info = json.loads(result.stdout)
     return [path for path in conda_info["pkgs_dirs"] if Path(path).is_dir()]
@@ -122,7 +141,12 @@ def get_package_list() -> List[JSONDict]:
         # Retrieve results in JSON format.
         "--json",
     ] + BASE_PACKAGES
-    result = subprocess.run(command, check=True, stdout=subprocess.PIPE)
+    result = subprocess.run(
+        command,
+        check=True,
+        stdout=subprocess.PIPE,
+        env=get_conda_subprocess_env(),
+    )
     json_dict = json.loads(result.stdout)
 
     package_list = json_dict["actions"]["LINK"]
@@ -187,7 +211,11 @@ def populate_repo_packages(package_infos: List[JSONDict], repo_root: str) -> Non
 
 def index_repo(repo_root: str) -> None:
     """Call `conda index` on the repo directory to finalize it."""
-    subprocess.run(["conda", "index", repo_root], check=True)
+    subprocess.run(
+        ["conda", "index", repo_root],
+        check=True,
+        env=get_conda_subprocess_env(),
+    )
 
 
 def sha256sum(path: str) -> str:
