@@ -45,6 +45,16 @@ def main() -> None:
     # Build the repo
     packages = get_package_list()
     populate_repo_packages(packages, CONDA_REPO_DIR)
+
+    # The Snowflake AnacondaPackagesUploader requires that the linux-64
+    # subdir be present, regardless of whether we have linux-64 packages.
+    # TODO: remove this when AnacondaPackagesUploader is fixed.
+    os.makedirs(os.path.join(CONDA_REPO_DIR, "linux-64"), exist_ok=True)
+
+    # It also requires a "timestamp" file with "1" written to it.
+    with open(os.path.join(CONDA_REPO_DIR, "timestamp"), "w") as timestamp_file:
+        timestamp_file.write("1")
+
     index_repo(CONDA_REPO_DIR)
 
     # Write out the "PYTHON_UDF_X86_PRPR_TOP_LEVEL_PACKAGES_FROZEN_SOLVE_VERSIONS"
