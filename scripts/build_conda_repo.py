@@ -6,7 +6,7 @@ import shutil
 import subprocess
 from collections import OrderedDict
 from pathlib import Path
-from typing import Dict, Any, List, cast
+from typing import Dict, Any, List, cast, Tuple
 
 import requests
 
@@ -32,14 +32,21 @@ UDF_JSON_FILENAME = "PYTHON_UDF_X86_PRPR_TOP_LEVEL_PACKAGES_FROZEN_SOLVE_VERSION
 # The architecture to build for, or "None" to build for the local architecture.
 CONDA_SUBDIR = "linux-aarch64"
 
+# Additional files that need to be present in the conda repo in order for
+# Snowflake to accept the repo.
+ADDITIONAL_REPO_FILES: List[Tuple[str, str]] = [
+    ("timestamp", "1"),
+    ("release_version", "6.9.0"),
+]
+
 
 def main() -> None:
     print(f"Building conda repo for {CONDA_SUBDIR}")
 
     # Populate our local cache. (This unfortunately means we're having
     # conda solve the environment twice, once to pre-warm the cache,
-    # and then immediately again to generate the package list.
-    # TODO: download_packages_to_cache() and get_package_list() be combined?)
+    # and then immediately again to generate the package list.)
+    # TODO: can download_packages_to_cache() and get_package_list() be combined?
     download_packages_to_cache()
 
     # Build the repo
@@ -51,9 +58,12 @@ def main() -> None:
     # TODO: remove this when AnacondaPackagesUploader is fixed.
     os.makedirs(os.path.join(CONDA_REPO_DIR, "linux-64"), exist_ok=True)
 
-    # It also requires a "timestamp" file with "1" written to it.
-    with open(os.path.join(CONDA_REPO_DIR, "timestamp"), "w") as timestamp_file:
-        timestamp_file.write("1")
+    # It also requires several other files
+    for repo_file in ADDITIONAL_REPO_FILES:
+        filename = os.path.join(CONDA_REPO_DIR, repo_file[0])
+        file_contents = repo_file[1]
+        with open(filename, "w") as f:
+            f.write(file_contents)
 
     index_repo(CONDA_REPO_DIR)
 
