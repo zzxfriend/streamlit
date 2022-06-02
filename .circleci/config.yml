@@ -229,19 +229,7 @@ workflows:
           filters:
             tags:
               only: /^(([0-9]+\.){3}dev[0-9]+)/
-      - python-max-version-medium:
-          filters:
-            tags:
-              only: /^(([0-9]+\.){3}dev[0-9]+)/
-      - python-max-version-medium+:
-          filters:
-            tags:
-              only: /^(([0-9]+\.){3}dev[0-9]+)/
-      - python-max-version-large:
-          filters:
-            tags:
-              only: /^(([0-9]+\.){3}dev[0-9]+)/
-      - python-max-version-xlarge:
+      - python-max-version-sized:
           filters:
             tags:
               only: /^(([0-9]+\.){3}dev[0-9]+)/
@@ -574,7 +562,7 @@ jobs:
     docker:
       - image: circleci/python:3.7.12
 
-  python-max-version-<< matrix.size >>:
+  python-max-version-sized:
     <<: *job-template
     resource_class: << matrix.size >>
     matrix:
