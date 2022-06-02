@@ -531,7 +531,7 @@ jobs:
       - run:
           name: Run frontend tests
           command: |
-            if [ "${CIRCLE_JOB}" != "python-max-version" ] ; then
+            if [ "${CIRCLE_JOB:0:18}" != "python-max-version" ] ; then
               echo "Frontend tests are only run in python-max-version job"
             else
               make jstest
