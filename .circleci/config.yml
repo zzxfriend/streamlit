@@ -566,8 +566,11 @@ jobs:
       - image: circleci/python:3.7.12
 
   python-max-version-sized:
-    <<: *job-template
+    parameters:
+      size:
+        type: string
     resource_class: << parameters.size >>
+    <<: *job-template
 
   python-prod-deps-smoke-test:
     docker:
