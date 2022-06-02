@@ -233,6 +233,9 @@ workflows:
           filters:
             tags:
               only: /^(([0-9]+\.){3}dev[0-9]+)/
+          matrix:
+            parameters:
+              size: ["medium", "medium+", "large", "xlarge"]
       - python-prod-deps-smoke-test: # Make sure Streamlit runs without dev dependencies
           filters:
             tags:
@@ -564,10 +567,7 @@ jobs:
 
   python-max-version-sized:
     <<: *job-template
-    resource_class: << matrix.size >>
-    matrix:
-      parameters:
-        size: ["medium", "medium+", "large", "xlarge"]
+    resource_class: << parameters.size >>
 
   python-prod-deps-smoke-test:
     docker:
