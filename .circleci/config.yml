@@ -229,6 +229,22 @@ workflows:
           filters:
             tags:
               only: /^(([0-9]+\.){3}dev[0-9]+)/
+      - python-max-version-medium:
+          filters:
+            tags:
+              only: /^(([0-9]+\.){3}dev[0-9]+)/
+      - python-max-version-medium+:
+          filters:
+            tags:
+              only: /^(([0-9]+\.){3}dev[0-9]+)/
+      - python-max-version-large:
+          filters:
+            tags:
+              only: /^(([0-9]+\.){3}dev[0-9]+)/
+      - python-max-version-xlarge:
+          filters:
+            tags:
+              only: /^(([0-9]+\.){3}dev[0-9]+)/
       - python-prod-deps-smoke-test: # Make sure Streamlit runs without dev dependencies
           filters:
             tags:
@@ -557,6 +573,13 @@ jobs:
     <<: *job-template
     docker:
       - image: circleci/python:3.7.12
+
+  python-max-version-<< matrix.size >>:
+    <<: *job-template
+    resource_class: << matrix.size >>
+    matrix:
+      parameters:
+        size: ["medium", "medium+", "large", "xlarge"]
 
   python-prod-deps-smoke-test:
     docker:
