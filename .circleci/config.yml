@@ -236,6 +236,7 @@ workflows:
           matrix:
             parameters:
               size: ["medium", "medium+", "large", "xlarge"]
+              workers: [1, 2, 4, 8]
       - python-prod-deps-smoke-test: # Make sure Streamlit runs without dev dependencies
           filters:
             tags:
@@ -457,6 +458,9 @@ jobs:
           failure_message: ":blobonfire: Release of version ${STREAMLIT_RELEASE_VERSION} failed"
 
   python-max-version: &job-template
+    parameters:
+      workers:
+        type: number
     docker:
       - image: circleci/python:3.10.0
 
@@ -534,7 +538,8 @@ jobs:
             if [ "${CIRCLE_JOB:0:18}" != "python-max-version" ] ; then
               echo "Frontend tests are only run in python-max-version job"
             else
-              make jstest
+              # make jstest
+              cd frontend; yarn run test --max-workers=<< parameters.workers >>
             fi
 
       - save_cache:
