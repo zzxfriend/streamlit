@@ -560,6 +560,8 @@ jobs:
 
   python-max-version-sized:
     parameters:
+      workers:
+        type: string
       size:
         type: string
     resource_class: << parameters.size >>
