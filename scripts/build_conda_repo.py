@@ -4,6 +4,7 @@ import json
 import os.path
 import shutil
 import subprocess
+import sys
 from collections import OrderedDict
 from pathlib import Path
 from typing import Dict, Any, List, cast, Tuple
@@ -43,6 +44,8 @@ ADDITIONAL_REPO_FILES: List[Tuple[str, str]] = [
 def main() -> None:
     print(f"Building conda repo for {CONDA_SUBDIR}")
 
+    check_prereqs()
+
     # Populate our local cache. (This unfortunately means we're having
     # conda solve the environment twice, once to pre-warm the cache,
     # and then immediately again to generate the package list.)
@@ -74,6 +77,15 @@ def main() -> None:
         f.write(udf_json_string)
 
     print(f"\nconda repo successfully built at {CONDA_REPO_DIR}!")
+
+
+def check_prereqs() -> None:
+    if not Path(STREAMLIT_PACKAGE_DIR).is_dir():
+        print(
+            f"Missing Streamlit conda package directory at {STREAMLIT_PACKAGE_DIR}. Did you run `make conda-package`?",
+            file=sys.stderr,
+        )
+        exit(1)
 
 
 def get_conda_subprocess_env() -> Dict[str, str]:
