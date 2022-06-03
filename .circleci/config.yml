@@ -227,8 +227,8 @@ workflows:
               only: /^(([0-9]+\.){3}dev[0-9]+)/
           matrix:
             parameters:
-              size: ["medium", "medium+", "large", "xlarge"]
-              workers: ["1", "2", "4", "8"]
+              size: ["medium", "large", "xlarge"]
+              workers: ["1", "2", "4"]
       - cypress: # Non flaky Cypress tests
           filters:
             tags:
