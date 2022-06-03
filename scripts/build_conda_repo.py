@@ -16,7 +16,7 @@ JSONDict = Dict[str, Any]
 # This should always include streamlit and our target Python version.
 BASE_PACKAGES = ["streamlit", "python=3.8"]
 
-ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+ROOT_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 # The directory that our Streamlit conda package is built into (the output
 # of `make conda-distribution`).
