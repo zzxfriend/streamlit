@@ -236,7 +236,7 @@ workflows:
           matrix:
             parameters:
               size: ["medium", "medium+", "large", "xlarge"]
-              workers: [1, 2, 4, 8]
+              workers: ["1", "2", "4", "8"]
       - python-prod-deps-smoke-test: # Make sure Streamlit runs without dev dependencies
           filters:
             tags:
@@ -460,7 +460,7 @@ jobs:
   python-max-version: &job-template
     parameters:
       workers:
-        type: number
+        type: string
     docker:
       - image: circleci/python:3.10.0
 
