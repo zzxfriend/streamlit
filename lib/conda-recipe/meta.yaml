@@ -44,7 +44,7 @@ requirements:
     - pyarrow >=6.0.0, <6.1.0
     - pydeck >=0.1.dev5
     - pympler >=0.9
-    - python >=3.6
+    - python >=3.7
     - python-dateutil
     - requests
     - semver
