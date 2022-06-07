@@ -113,7 +113,7 @@ def download_packages_to_cache() -> None:
         # Look for the streamlit package in the location it gets built.
         "--channel",
         STREAMLIT_PACKAGE_DIR,
-        "--strict-channel-priority",
+        # "--strict-channel-priority",
         # Do not ask for confirmation.
         "--yes",
         # Download the repo's packages, but don't create the repo.
@@ -166,7 +166,7 @@ def get_package_list() -> List[JSONDict]:
         # Look for the streamlit package in the location it gets built.
         "--channel",
         STREAMLIT_PACKAGE_DIR,
-        "--strict-channel-priority",
+        # "--strict-channel-priority",
         # Do not ask for confirmation.
         "--yes",
         "--dry-run",
