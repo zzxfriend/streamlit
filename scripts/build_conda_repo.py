@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import contextlib
 import hashlib
 import json
 import os.path
@@ -7,7 +8,7 @@ import subprocess
 import sys
 from collections import OrderedDict
 from pathlib import Path
-from typing import Dict, Any, List, cast, Tuple
+from typing import Dict, Any, List, cast, Tuple, NoReturn
 
 import requests
 
@@ -46,46 +47,85 @@ def main() -> None:
 
     check_prereqs()
 
-    # Populate our local cache. (This unfortunately means we're having
-    # conda solve the environment twice, once to pre-warm the cache,
-    # and then immediately again to generate the package list.)
-    # TODO: can download_packages_to_cache() and get_package_list() be combined?
-    download_packages_to_cache()
+    with add_conda_forge_channel():
+        # Populate our local cache. (This unfortunately means we're having
+        # conda solve the environment twice, once to pre-warm the cache,
+        # and then immediately again to generate the package list.)
+        # TODO: can download_packages_to_cache() and get_package_list() be combined?
+        download_packages_to_cache()
 
-    # Build the repo
-    packages = get_package_list()
-    populate_repo_packages(packages, CONDA_REPO_DIR)
+        # Build the repo
+        packages = get_package_list()
+        populate_repo_packages(packages, CONDA_REPO_DIR)
 
-    # The Snowflake AnacondaPackagesUploader requires that the linux-64
-    # subdir be present, regardless of whether we have linux-64 packages.
-    # TODO: remove this when AnacondaPackagesUploader is fixed.
-    os.makedirs(os.path.join(CONDA_REPO_DIR, "linux-64"), exist_ok=True)
+        # The Snowflake AnacondaPackagesUploader requires that the linux-64
+        # subdir be present, regardless of whether we have linux-64 packages.
+        # TODO: remove this when AnacondaPackagesUploader is fixed.
+        os.makedirs(os.path.join(CONDA_REPO_DIR, "linux-64"), exist_ok=True)
 
-    # It also requires several other files
-    for repo_file in ADDITIONAL_REPO_FILES:
-        filename = os.path.join(CONDA_REPO_DIR, repo_file[0])
-        file_contents = repo_file[1]
-        with open(filename, "w") as f:
-            f.write(file_contents)
+        # It also requires several other files
+        for repo_file in ADDITIONAL_REPO_FILES:
+            filename = os.path.join(CONDA_REPO_DIR, repo_file[0])
+            file_contents = repo_file[1]
+            with open(filename, "w") as f:
+                f.write(file_contents)
 
-    index_repo(CONDA_REPO_DIR)
+        index_repo(CONDA_REPO_DIR)
 
-    # Write out the "PYTHON_UDF_X86_PRPR_TOP_LEVEL_PACKAGES_FROZEN_SOLVE_VERSIONS"
-    # JSON file.
-    udf_json_string = generate_udf_packages_json(packages, CONDA_REPO_DIR)
-    with open(os.path.join(CONDA_REPO_DIR, UDF_JSON_FILENAME), "w") as f:
-        f.write(udf_json_string)
+        # Write out the "PYTHON_UDF_X86_PRPR_TOP_LEVEL_PACKAGES_FROZEN_SOLVE_VERSIONS"
+        # JSON file.
+        udf_json_string = generate_udf_packages_json(packages, CONDA_REPO_DIR)
+        with open(os.path.join(CONDA_REPO_DIR, UDF_JSON_FILENAME), "w") as f:
+            f.write(udf_json_string)
 
-    print(f"\nconda repo successfully built at {CONDA_REPO_DIR}!")
+        print(f"\nconda repo successfully built at {CONDA_REPO_DIR}!")
+
+
+@contextlib.contextmanager
+def add_conda_forge_channel() -> None:
+    """If the conda-forge channel is not in the user's conda channel list,
+    add it, and then remove it again when the context manager exits.
+
+    Some of Streamlit's dependencies exist only in conda-forge, and not in
+    the default conda channel. If conda-forge isn't in the conda channel
+    list when building the repo, dependency solving will fail.
+    """
+    # Check to see if we have the conda-forge channel
+    result = subprocess.run(
+        ["conda", "config", "--show", "channels", "--json"],
+        check=True,
+        stdout=subprocess.PIPE,
+        env=get_conda_subprocess_env(),
+    )
+    conda_info = json.loads(result.stdout)
+    has_conda_forge_channel = "conda-forge" in conda_info["channels"]
+
+    if not has_conda_forge_channel:
+        print("Adding conda-forge channel...")
+        subprocess.run(
+            ["conda", "config", "--add", "channels", "conda-forge"],
+            check=True,
+            env=get_conda_subprocess_env(),
+        )
+
+    try:
+        yield
+    finally:
+        if not has_conda_forge_channel:
+            print("Removing conda-forge channel...")
+            subprocess.run(
+                ["conda", "config", "--remove", "channels", "conda-forge"],
+                check=True,
+                env=get_conda_subprocess_env(),
+            )
 
 
 def check_prereqs() -> None:
     if not Path(STREAMLIT_PACKAGE_DIR).is_dir():
-        print(
-            f"Missing Streamlit conda package directory at {STREAMLIT_PACKAGE_DIR}. Did you run `make conda-package`?",
-            file=sys.stderr,
+        fatal(
+            f"Missing Streamlit conda package directory at "
+            f"{STREAMLIT_PACKAGE_DIR}. Did you run `make conda-package`?"
         )
-        exit(1)
 
 
 def get_conda_subprocess_env() -> Dict[str, str]:
@@ -300,6 +340,12 @@ def generate_udf_packages_json(package_infos: List[JSONDict], repo_root: str) ->
         )
 
     return json.dumps(json_dict, indent=None)
+
+
+def fatal(message: str) -> NoReturn:
+    """Print an error message and exit with a non-zero exit code."""
+    print(message, file=sys.stderr)
+    exit(1)
 
 
 if __name__ == "__main__":
