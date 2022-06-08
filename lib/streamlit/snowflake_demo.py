@@ -41,12 +41,14 @@ from streamlit.server.server import Server
 # Monkey-patch StoredProcConnection._format_query_for_log as a no-op.
 # TODO: remove this when until we have a fixed package.
 try:
-    import snowflake.connector
+    import snowflake.connector  # type: ignore
 
     def _format_query_for_log(self, query):
         return None
 
-    snowflake.connector.StoredProcConnection._format_query_for_log = _format_query_for_log  # type: ignore
+    snowflake.connector.StoredProcConnection._format_query_for_log = (
+        _format_query_for_log
+    )
 except:
     pass
 
