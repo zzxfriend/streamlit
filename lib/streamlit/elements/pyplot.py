@@ -15,11 +15,11 @@
 """Streamlit support for Matplotlib PyPlot charts."""
 
 import io
-from pprint import PrettyPrinter
+import pprint
+import random
 from typing import cast
 import hashlib
 import string
-import random
 
 import streamlit
 import streamlit.elements.image as image_utils
@@ -28,8 +28,10 @@ from streamlit.errors import StreamlitDeprecationWarning
 from streamlit.logger import get_logger
 from streamlit.proto.Image_pb2 import ImageList as ImageListProto
 from streamlit.proto.Pyplot_pb2 import Pyplot as PyplotProto
-from streamlit.elements.iframe import marshall
 from streamlit.proto.IFrame_pb2 import IFrame as IFrameProto
+from streamlit.elements.iframe import marshall
+from streamlit.proto.Alert_pb2 import Alert as AlertProto
+from .utils import clean_text
 
 LOGGER = get_logger(__name__)
 
@@ -107,23 +109,132 @@ class PyplotMixin:
             except ImportError:
                 raise ImportError("pyplot() command requires matplotlib")
             return self.dg._enqueue("imgs", image_list_proto)
+
         else: 
             try:
                 import json
                 import matplotlib
                 import matplotlib.pyplot as plt, mpld3
-                # from mpld3 import plugins
-
-                plt.ioff()
+                from mpld3 import plugins
+                
             except ImportError:
                 raise ImportError("pyplot() command requires matplotlib")
+#             print(f"FIX AXES: {fig.axes}")
+
+#             if not fig:
+#                 if clear_figure is None:
+#                     clear_figure = True
+
+#                 fig = plt
+#             for axes in fig.axes:
+#                 for line in axes.get_lines():
+#                     xy_data = line.get_xydata()
+#                     # print(f"TYPE OF XY_DATA: {type(xy_data)}")
+#                     # print(f"LINE: {xy_data}")
+#                     css = """
+# table
+# {
+#   border-collapse: collapse;
+# }
+# th
+# {
+#   color: #ffffff;
+#   background-color: #000000;
+# }
+# td
+# {
+#   background-color: #cccccc;
+# }
+# table, th, td
+# {
+#   font-family:Arial, Helvetica, sans-serif;
+#   border: 1px solid black;
+#   text-align: right;
+# }
+# """
+#                     labels = []
+#                     print(f"LEN OF XY_DATA: {len(xy_data)}")
+#                     for i in range(len(xy_data)):
+#                         print(f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> <th></th> <th>Point {i}</th> </tr> </thead> <tbody> <tr> <th>x</th> <td>{xy_data[i][0]}</td> </tr> <tr> <th>y</th> <td>{xy_data[i][1]}</td> </tr> </tbody> </table>')
+#                         labels.append(f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> <th></th> <th>Point {i}</th> </tr> </thead> <tbody> <tr> <th>x</th> <td>{xy_data[i][0]}</td> </tr> <tr> <th>y</th> <td>{xy_data[i][1]}</td> </tr> </tbody> </table>')
+#                     # print(f"LABELS: {labels}")
+#                     tooltip = plugins.PointHTMLTooltip(points=line, labels=labels, css=css)
+#             # label = '<h1>Line {}</h1>'.format('A')
+#             # tooltip = plugins.connect(fig, plugins.LineHTMLTooltip(fig.axes[0].get_lines()[0], label))
+#                     plugins.connect(fig, tooltip)
+#             # print(f"LEN OF LABELS: {len(labels)}")
+
             # TODO: Figure out how to size the image with dpi but for now make it 200
             if fig.dpi < 200:
                 fig.dpi = 200
             h = hashlib.new("md5")
             
+            # print(f"TYPE OF FIG: {type(fig)}")
+            # print(fig._localaxes)
+            # css = """
+            #     table
+            #     {
+            #     border-collapse: collapse;
+            #     }
+            #     th
+            #     {
+            #     color: #ffffff;
+            #     background-color: #000000;
+            #     }
+            #     td
+            #     {
+            #     background-color: #cccccc;
+            #     }
+            #     table, th, td
+            #     {
+            #     font-family:Arial, Helvetica, sans-serif;
+            #     border: 1px solid black;
+            #     text-align: right;
+            #     }
+            #     """
+            for axes in fig.axes:
+                for line in axes.get_lines():
+                    # linestyle = line.get_linestyle()
+                    # # '.' linestyle does not work with line tooltip for some reason.
+                    # if linestyle == '-' or linestyle == '--' or linestyle=='-.':
+                    #     label = '<h1>line {title}</h1>'.format(title='A')
+                    #     tooltip = plugins.LineHTMLTooltip(line, label)
+                    #     # tooltip = plugins.LineLabelTooltip(line)
+                    #     print(f"THIS AXES({axes}) MAPS TO {linestyle})")
+                    # else:
+                    xy_data = line.get_xydata()
+                        # print(f"TYPE OF XY_DATA: {type(xy_data)}")
+                        # print(f"LINE: {xy_data}")
+                        # print(f"LEN OF XYDATA: {len(xy_data)}")
+                
+                    labels=[]
+                        # print(f"LEN OF XYDATA {len(xy_data)}")
+                    for i in range(len(xy_data)):
+                        label = xy_data[i]
+                        #this should move to the frontend
+                        label_string = f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> <th></th> <th>Row {i}</th> </tr> </thead> <tbody> <tr> <th>x</th> <td>{label[0]}</td> </tr> <tr> <th>y</th> <td>{label[1]}</td> </tr> </tbody> </table>'
+                        labels.append(label_string)
+                            # print(labels)
+                            # .to_html() is unicode; so make leading 'u' go away with str()
+                            # labels.append(label_string)
+                    tooltip = plugins.PointHTMLTooltip(points=line, labels=labels)
+                    plugins.connect(fig, tooltip) 
+            # html_string = mpld3.fig_to_dict(fig)
+            # print(pprint.pformat(html_string))
+            # print(fig.axes[0])
+            # print(html_string)
+            # iframe_proto = IFrameProto()
+            # width, height = fig.get_size_inches() * fig.dpi
+            # marshall(iframe_proto, srcdoc=html_string, height=height +10, width=width)
+            # return self.dg._enqueue("iframe", iframe_proto)
             fig_json = mpld3.fig_to_dict(fig)
-            json_dump = json.dumps(fig_json)
+            try:
+                json_dump = json.dumps(fig_json)
+            except TypeError as e:
+                alert_proto = AlertProto()
+                alert_proto.body = clean_text("Looks like you're trying to render an interactive 3d pyplot! We do not support that at this time because of https://github.com/mpld3/mpld3/issues/223. Try using the interactive=false mode!")
+                alert_proto.format = AlertProto.ERROR
+                return self.dg._enqueue("alert", alert_proto)
             
             encoded = json_dump.encode()
             h.update(encoded)
@@ -133,9 +244,8 @@ class PyplotMixin:
             pyplot_proto = PyplotProto()
             pyplot_proto.json = json_dump
             pyplot_proto.width = width
-            # ensure that we have the first character as a letter 
-            # since css ids need to have a letter first
-            pyplot_proto.id = random.choice(string.ascii_letters) + h.hexdigest()[1:]
+            pyplot_proto.id = "fig" + h.hexdigest() 
+            print(f"ID: {pyplot_proto.id}")
             
             return self.dg._enqueue("pyplot", pyplot_proto)
 
@@ -145,7 +255,7 @@ class PyplotMixin:
         return cast("streamlit.delta_generator.DeltaGenerator", self)
 
 
-def marshall_image(coordinates, image_list_proto, fig=None, clear_figure=True, interactive=None, **kwargs):
+def marshall_image(coordinates, image_list_proto, fig=None, clear_figure=True, interactive=False, **kwargs):
     try:
         import matplotlib
         import matplotlib.pyplot as plt

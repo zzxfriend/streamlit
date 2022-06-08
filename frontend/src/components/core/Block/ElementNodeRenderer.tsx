@@ -53,6 +53,7 @@ import {
 } from "src/autogen/proto"
 
 import React, { ReactElement, Suspense } from "react"
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import debounceRender from "react-debounce-render"
 import { ElementNode } from "src/lib/AppNode"
