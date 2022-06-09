@@ -8,7 +8,7 @@ import subprocess
 import sys
 from collections import OrderedDict
 from pathlib import Path
-from typing import Dict, Any, List, cast, Tuple, NoReturn
+from typing import Dict, Any, List, cast, Tuple, NoReturn, Iterator
 
 import requests
 
@@ -82,7 +82,7 @@ def main() -> None:
 
 
 @contextlib.contextmanager
-def add_conda_forge_channel() -> None:
+def add_conda_forge_channel() -> Iterator[None]:
     """If the conda-forge channel is not in the user's conda channel list,
     add it, and then remove it again when the context manager exits.
 
