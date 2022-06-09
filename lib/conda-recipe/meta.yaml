@@ -30,7 +30,7 @@ requirements:
     - blinker >=1.0.0
     - cachetools >=4.0
     - click >=7.0, <8.1
-    - gitpython >=3.1.20
+    # - gitpython >=3.1.20
     - importlib-metadata >=1.4
     - numpy
     - packaging >=14.1
@@ -38,7 +38,7 @@ requirements:
     - pillow >=6.2.0
     - protobuf >=3.12, <4
     - pyarrow >=4.0
-    - pydeck >=0.1.dev5
+    # - pydeck >=0.1.dev5
     - pympler >=0.9
     - python >=3.7
     - python-dateutil
