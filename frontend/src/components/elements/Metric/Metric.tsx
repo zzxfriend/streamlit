@@ -42,6 +42,7 @@ export default function Metric({ element }: MetricProps): ReactElement {
   let direction: any = null
   let color = ""
 
+  //temporary comment
   switch (element.color) {
     case MetricColor.RED:
       color = colors.red
