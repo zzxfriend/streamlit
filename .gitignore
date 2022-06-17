@@ -8,12 +8,13 @@ __pycache__/
 
 # Distribution / packaging
 build/
-dist/
+lib/dist/
 eggs/
 .eggs/
 *.egg-info/
 *.egg
 .prerelease-version
+.cache/
 
 # Preloaded, minified js (downloaded via script due to dependencies having
 # issues with babel transpilation).
