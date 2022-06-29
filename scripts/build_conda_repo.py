@@ -33,6 +33,10 @@ UDF_JSON_FILENAME = "PYTHON_UDF_X86_PRPR_TOP_LEVEL_PACKAGES_FROZEN_SOLVE_VERSION
 # The architecture to build for, or "None" to build for the local architecture.
 CONDA_SUBDIR = "linux-aarch64"
 
+# The conda channel to pull dependencies from.
+# Valid values are "default" and "conda-forge".
+CONDA_CHANNEL = "default"
+
 # Additional files that need to be present in the conda repo in order for
 # Snowflake to accept the repo.
 ADDITIONAL_REPO_FILES: List[Tuple[str, str]] = [
@@ -42,7 +46,7 @@ ADDITIONAL_REPO_FILES: List[Tuple[str, str]] = [
 
 
 def main() -> None:
-    print(f"Building conda repo for {CONDA_SUBDIR}")
+    print(f"Building conda repo (arch={CONDA_SUBDIR}, channel={CONDA_CHANNEL})")
 
     check_prereqs()
 
@@ -113,7 +117,7 @@ def download_packages_to_cache() -> None:
         "--channel",
         STREAMLIT_PACKAGE_DIR,
         "--channel",
-        "conda-forge",
+        CONDA_CHANNEL,
         "--strict-channel-priority",
         # Do not ask for confirmation.
         "--yes",
@@ -168,7 +172,7 @@ def get_package_list() -> List[JSONDict]:
         "--channel",
         STREAMLIT_PACKAGE_DIR,
         "--channel",
-        "conda-forge",
+        CONDA_CHANNEL,
         "--strict-channel-priority",
         # Do not ask for confirmation.
         "--yes",
