@@ -31,6 +31,9 @@ CONDA_REPO_DIR = os.path.join(ROOT_DIR, "conda_repo")
 UDF_JSON_FILENAME = "PYTHON_UDF_X86_PRPR_TOP_LEVEL_PACKAGES_FROZEN_SOLVE_VERSIONS.json"
 
 # The architecture to build for, or "None" to build for the local architecture.
+# Valid values are "linux-32", "linux-64", "linux-aarch64", "linux-armv6l",
+# "linux-armv7l", "linux-ppc64le", "linux-s390x", "osx-64", "osx-arm64",
+# "win-32", "win-64", "zos-z" (and any other platforms conda supports in the future.)
 CONDA_SUBDIR = "linux-aarch64"
 
 # The conda channel to pull dependencies from.
