@@ -156,13 +156,19 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
   // Widths of children autosizes to container width (and therefore window width).
   // StyledVerticalBlocks are the only things that calculate their own widths. They should never use
   // the width value coming from the parent via props.
-  const width = 160
-  const propsWithNewWidth = {...props, width}
-          return (
+  return (
+    <AutoSizer disableHeight={true} style={styledVerticalBlockWrapperStyles}>
+      {({ width }) => {
+        const propsWithNewWidth = { ...props, ...{ width } }
+
+        return (
           <StyledVerticalBlock width={width} data-testid="stVerticalBlock">
             <ChildRenderer {...propsWithNewWidth} />
           </StyledVerticalBlock>
         )
+      }}
+    </AutoSizer>
+  )
 }
 
 const HorizontalBlock = (props: BlockPropsWithWidth): ReactElement => {
