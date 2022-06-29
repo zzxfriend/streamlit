@@ -242,6 +242,25 @@ class LayoutsMixin:
 
         return self.dg._block(block_proto=block_proto)
 
+    def row(self, gap=None) -> "DeltaGenerator":
+        gap_exception = StreamlitAPIException(
+            "Must be small, medium or large"
+        )
+        
+        GAP_CONSTANTS = ["small", "medium", "large"]
+
+        if gap != None:
+            lower_gap = gap.lower()
+
+            if lower_gap not in GAP_CONSTANTS:
+                raise gap_exception
+
+        block_proto = BlockProto()
+        row_proto = BlockProto.Row()
+        block_proto.row.CopyFrom(row_proto)
+
+        return self.dg._block(block_proto=block_proto)
+
     @property
     def dg(self) -> "DeltaGenerator":
         """Get our DeltaGenerator."""

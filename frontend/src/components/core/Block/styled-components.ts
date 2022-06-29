@@ -30,9 +30,22 @@ export const StyledHorizontalBlock = styled.div(({ theme }) => ({
   gap: theme.spacing.lg,
 }))
 
+export const StyledHorizontalTestBlock = styled.div<StyledVerticalBlockProps>(
+  // @ts-ignore
+  ({ width, theme }) => ({
+    width,
+    position: "relative", // Required for the automatic width computation.
+
+    display: "flex",
+    flex: 1,
+    flexDirection: "row",
+    gap: theme.spacing.lg,
+  })
+)
+
 export interface StyledElementContainerProps {
   isStale: boolean
-  width: number
+  width: number | string
   elementType: string
 }
 
@@ -110,6 +123,12 @@ export const styledVerticalBlockWrapperStyles: any = {
   flex: 1,
 }
 
+export const styledHorizontalBlockWrapperStyles: any = {
+  display: "flex",
+  flexDirection: "row",
+  flex: 1,
+}
+
 export interface StyledVerticalBlockProps {
   ref?: React.RefObject<any>
   width?: number
@@ -121,9 +140,9 @@ export const StyledVerticalBlock = styled.div<StyledVerticalBlockProps>(
     width,
     position: "relative", // Required for the automatic width computation.
 
-    display: "flex",
+    display: "inline-block",
     flex: 1,
-    flexDirection: "column",
+    flexDirection: "row",
     gap: theme.spacing.lg,
   })
 )

@@ -23,6 +23,7 @@ message Block {
     Column column = 3;
     Expandable expandable = 4;
     Form form = 5;
+    Row row = 7;
   }
 
   bool allow_empty = 6;
@@ -31,6 +32,10 @@ message Block {
   }
 
   message Horizontal {
+  }
+
+  message Row {
+
   }
 
   message Column {
@@ -47,5 +52,5 @@ message Block {
     bool clear_on_submit = 2;
   }
 
-  // Next ID: 7
+  // Next ID: 8
 }

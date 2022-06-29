@@ -49,7 +49,7 @@ export interface SidebarProps {
 
 interface State {
   collapsedSidebar: boolean
-  lastInnerWidth: number
+  lastInnerWidth: number | string
 
   // When hovering the nav
   hideScrollbar: boolean

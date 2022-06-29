@@ -34,6 +34,8 @@ import ElementNodeRenderer from "./ElementNodeRenderer"
 import {
   StyledColumn,
   StyledHorizontalBlock,
+  styledHorizontalBlockWrapperStyles,
+  StyledHorizontalTestBlock,
   StyledVerticalBlock,
   styledVerticalBlockWrapperStyles,
 } from "./styled-components"
@@ -154,19 +156,13 @@ const VerticalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
   // Widths of children autosizes to container width (and therefore window width).
   // StyledVerticalBlocks are the only things that calculate their own widths. They should never use
   // the width value coming from the parent via props.
-  return (
-    <AutoSizer disableHeight={true} style={styledVerticalBlockWrapperStyles}>
-      {({ width }) => {
-        const propsWithNewWidth = { ...props, ...{ width } }
-
-        return (
+  const width = 160
+  const propsWithNewWidth = {...props, width}
+          return (
           <StyledVerticalBlock width={width} data-testid="stVerticalBlock">
             <ChildRenderer {...propsWithNewWidth} />
           </StyledVerticalBlock>
         )
-      }}
-    </AutoSizer>
-  )
 }
 
 const HorizontalBlock = (props: BlockPropsWithWidth): ReactElement => {
@@ -180,8 +176,24 @@ const HorizontalBlock = (props: BlockPropsWithWidth): ReactElement => {
   )
 }
 
+const TestHorizontalBlock = (props: BlockPropsWithoutWidth): ReactElement => {
+  // Create a horizontal block as the parent for columns.
+  // The children are always columns, but this is not checked. We just trust the Python side to
+  // do the right thing, then we ask ChildRenderer to handle it.
+  console.log(props)
+  const propsWithNewWidth = { ...props, width: 160}
+  return (
+          <StyledHorizontalTestBlock data-testid="stHorizontalTestBlock">
+            <ChildRenderer {...propsWithNewWidth} />
+          </StyledHorizontalTestBlock>
+  )
+}
+
 // A container block with one of two types of layouts: vertical and horizontal.
 function LayoutBlock(props: BlockPropsWithWidth): ReactElement {
+  if (props.node.deltaBlock.row) {
+    return <TestHorizontalBlock {...props} />
+  }
   if (props.node.deltaBlock.horizontal) {
     return <HorizontalBlock {...props} />
   }

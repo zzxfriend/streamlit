@@ -39,7 +39,7 @@ export function getAlertKind(format: AlertProto.Format): Kind {
 export interface AlertProps {
   body: string
   kind: Kind
-  width: number
+  width: number | string
 }
 
 /**

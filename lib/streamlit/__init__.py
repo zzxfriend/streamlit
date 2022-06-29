@@ -152,6 +152,7 @@ plotly_chart = _main.plotly_chart
 progress = _main.progress
 pyplot = _main.pyplot
 radio = _main.radio
+row = _main.row
 selectbox = _main.selectbox
 select_slider = _main.select_slider
 slider = _main.slider

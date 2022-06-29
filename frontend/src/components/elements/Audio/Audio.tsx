@@ -21,7 +21,7 @@ import AppContext from "src/components/core/AppContext"
 import { buildMediaUri } from "src/lib/UriUtil"
 
 export interface AudioProps {
-  width: number
+  width: number | string
   element: AudioProto
 }
 

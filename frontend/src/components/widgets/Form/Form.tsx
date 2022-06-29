@@ -25,7 +25,7 @@ import { StyledErrorContainer, StyledForm } from "./styled-components"
 export interface Props {
   formId: string
   clearOnSubmit: boolean
-  width: number
+  width: number | string
   hasSubmitButton: boolean
   scriptRunState: ScriptRunState
   children?: ReactNode

@@ -602,6 +602,7 @@ const ElementNodeRenderer = (
   // since leaf elements are always direct children of a VerticalBlock, which always calculates
   // and propagates widths.
   const width = props.width ?? 0
+  console.log(width)
 
   // TODO: If would be great if we could return an empty fragment if isHidden is true, to keep the
   // DOM clean. But this would require the keys passed to ElementNodeRenderer at Block.tsx to be a
