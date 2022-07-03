@@ -129,11 +129,7 @@ function aboutDialog(props: AboutProps): ReactElement {
 
     // Markdown New line is 2 spaces + \n
     const newLineMarkdown = "  \n"
-    const StreamlitInfo = [
-      `Made with Streamlit v${SessionInfo.current.streamlitVersion}`,
-      STREAMLIT_HOME_URL,
-      `Copyright ${new Date().getFullYear()} Streamlit Inc. All rights reserved.`,
-    ].join(newLineMarkdown)
+    const StreamlitInfo = [``].join(newLineMarkdown)
 
     const source = `${props.aboutSectionMd} ${newLineMarkdown} ${newLineMarkdown} ${StreamlitInfo}`
 
